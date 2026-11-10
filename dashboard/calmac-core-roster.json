@@ -1,0 +1,30 @@
+{
+  "_comment": "Single source of truth for the Calmac's Core crew as it maps into the Claude-Office (Agent Office) app. role = the Claude Code agent/subagent name (its filename in ~/.claude/agents). sprite = base name for public/sprites/characters/<sprite>-{front,rear}-{left,right}.png. room = Claude-Office RoomId the desk lives in. Generated patches in patches/ are derived from this file.",
+  "boss": {
+    "role": "boss",
+    "title": "Calmac",
+    "emoji": "👑",
+    "color": "#d4af37",
+    "sprite": "Calmac-1",
+    "room": "ceo-office",
+    "wing": "Central Core"
+  },
+  "crew": [
+    { "role": "batman",             "title": "Batman",         "emoji": "🦇", "color": "#2c3e50", "sprite": "batman-1",             "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "martian-manhunter",  "title": "Manhunter",      "emoji": "🔮", "color": "#1e8449", "sprite": "martian-manhunter-1",  "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "iron-man",           "title": "Iron Man",       "emoji": "🔴", "color": "#c0392b", "sprite": "iron-man-1",           "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "deadpool",           "title": "Deadpool",       "emoji": "🔆", "color": "#cb4335", "sprite": "deadpool-1",           "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "doctor-strange",     "title": "Dr Strange",     "emoji": "🪄", "color": "#8e44ad", "sprite": "doctor-strange-1",     "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "spider-man",         "title": "Spider-Man",     "emoji": "🕷️", "color": "#d81e5b", "sprite": "spider-man-1",         "team": "build", "wing": "Watchtower",    "room": "main-office" },
+    { "role": "doctor-doom",        "title": "Dr Doom",        "emoji": "🟢", "color": "#4a6741", "sprite": "doctor-doom-1",        "team": "break", "wing": "The Lair",      "room": "server-room" },
+    { "role": "ultron",             "title": "Ultron",         "emoji": "🤖", "color": "#7f8c8d", "sprite": "ultron-1",             "team": "break", "wing": "The Lair",      "room": "server-room" },
+    { "role": "green-goblin",       "title": "Green Goblin",   "emoji": "🎃", "color": "#6b8e23", "sprite": "green-goblin-1",       "team": "break", "wing": "The Lair",      "room": "server-room" },
+    { "role": "loki",               "title": "Loki",           "emoji": "🐍", "color": "#16a085", "sprite": "loki-1",               "team": "break", "wing": "The Lair",      "room": "server-room" },
+    { "role": "venom",              "title": "Venom",          "emoji": "🖤", "color": "#1c1c22", "sprite": "venom-1",              "team": "break", "wing": "The Lair",      "room": "server-room" },
+    { "role": "alfred",             "title": "Alfred",         "emoji": "🎩", "color": "#34495e", "sprite": "alfred-1",             "team": "ops",   "wing": "Central Core",  "room": "manager-office" },
+    { "role": "nightcrawler",       "title": "Nightcrawler",   "emoji": "🔵", "color": "#2980b9", "sprite": "nightcrawler-1",       "team": "gamedev", "wing": "Game-Dev",    "room": "meeting-room" },
+    { "role": "hal-jordan",         "title": "Green Lantern",  "emoji": "💚", "color": "#2ecc71", "sprite": "hal-jordan-1",         "team": "gamedev", "wing": "Game-Dev",    "room": "meeting-room" },
+    { "role": "uatu",               "title": "Uatu",           "emoji": "👁️", "color": "#bdc3c7", "sprite": "uatu-1",               "team": "gamedev", "wing": "Game-Dev",    "room": "meeting-room" },
+    { "role": "rocket-raccoon",     "title": "Rocket",         "emoji": "🦝", "color": "#d35400", "sprite": "rocket-raccoon-1",     "team": "gamedev", "wing": "Game-Dev",    "room": "meeting-room" }
+  ]
+}

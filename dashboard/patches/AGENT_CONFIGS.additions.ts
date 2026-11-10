@@ -1,0 +1,18 @@
+// === Calmac's Core crew — paste into AGENT_CONFIGS in src/types.ts ===
+// (the 'boss' entry already exists; it reads office.config.json)
+  'batman':                { color: '#2c3e50', emoji: '🦇', title: 'Batman' },
+  'martian-manhunter':     { color: '#1e8449', emoji: '🔮', title: 'Manhunter' },
+  'iron-man':              { color: '#c0392b', emoji: '🔴', title: 'Iron Man' },
+  'deadpool':              { color: '#cb4335', emoji: '🔆', title: 'Deadpool' },
+  'doctor-strange':        { color: '#8e44ad', emoji: '🪄', title: 'Dr Strange' },
+  'spider-man':            { color: '#d81e5b', emoji: '🕷️', title: 'Spider-Man' },
+  'doctor-doom':           { color: '#4a6741', emoji: '🟢', title: 'Dr Doom' },
+  'ultron':                { color: '#7f8c8d', emoji: '🤖', title: 'Ultron' },
+  'green-goblin':          { color: '#6b8e23', emoji: '🎃', title: 'Green Goblin' },
+  'loki':                  { color: '#16a085', emoji: '🐍', title: 'Loki' },
+  'venom':                 { color: '#1c1c22', emoji: '🖤', title: 'Venom' },
+  'alfred':                { color: '#34495e', emoji: '🎩', title: 'Alfred' },
+  'nightcrawler':          { color: '#2980b9', emoji: '🔵', title: 'Nightcrawler' },
+  'hal-jordan':            { color: '#2ecc71', emoji: '💚', title: 'Green Lantern' },
+  'uatu':                  { color: '#bdc3c7', emoji: '👁️', title: 'Uatu' },
+  'rocket-raccoon':        { color: '#d35400', emoji: '🦝', title: 'Rocket' },

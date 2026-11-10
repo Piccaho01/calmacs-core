@@ -1,0 +1,18 @@
+// === Calmac's Core crew — paste into ROLE_TO_CHAR in src/config.ts ===
+// (the 'boss' entry is driven by office.config.json sprite)
+  'batman':                'batman-1',
+  'martian-manhunter':     'martian-manhunter-1',
+  'iron-man':              'iron-man-1',
+  'deadpool':              'deadpool-1',
+  'doctor-strange':        'doctor-strange-1',
+  'spider-man':            'spider-man-1',
+  'doctor-doom':           'doctor-doom-1',
+  'ultron':                'ultron-1',
+  'green-goblin':          'green-goblin-1',
+  'loki':                  'loki-1',
+  'venom':                 'venom-1',
+  'alfred':                'alfred-1',
+  'nightcrawler':          'nightcrawler-1',
+  'hal-jordan':            'hal-jordan-1',
+  'uatu':                  'uatu-1',
+  'rocket-raccoon':        'rocket-raccoon-1',
