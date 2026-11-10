@@ -86,12 +86,40 @@ file. (This is the one integration point to confirm live.)
 ```
 Open the office URL it prints. Trigger a Claude Code task and watch the crew work.
 
-## 8. Always-on + phone  ⚑
+## 8. Always-on + multi-device access  ⚑
 - **Autostart:** use the desktop app's launch-on-startup, or a Windows startup task
   running `start-office.sh`, so the office is up when the PC boots.
-- **Phone/tablet:** watch via **Remote Control** into the PC. The office itself stays
-  loopback-only — don't bind it to the LAN (the server refuses non-loopback on
-  purpose; every route is open on localhost by design).
+
+### Accessing it on iPhone, tablet and another PC — recommended: Tailscale
+The office **runs on the home PC** regardless (it visualizes Claude Code agents, which
+run where Claude Code runs). The easiest *private* way to reach that one host from all
+your devices is **Tailscale** — a free personal mesh VPN — using `tailscale serve`,
+which proxies the loopback office to your own devices over HTTPS. The office keeps
+binding `127.0.0.1`; Tailscale never exposes it to the public internet.
+
+1. Install **Tailscale** on the PC and on each device (iPhone, tablet, other PC) and
+   sign in to the **same account** — they join one private tailnet.
+2. On the PC, with the office running on port 3334:
+   ```bash
+   tailscale serve http://127.0.0.1:3334
+   ```
+3. Open the printed `https://<pc-name>.<tailnet>.ts.net` URL in the browser on any
+   device. On iPhone/tablet: **Share → Add to Home Screen** for an app-like icon.
+
+Why this over screen-mirroring: you get the **real, native, responsive app** on each
+device, reachable only by *your* logged-in devices — which matches the reason the
+office refuses a public/LAN bind.
+
+> **⚑ Likely tweak:** the office validates the request Host/Origin and may reject the
+> tailnet hostname at first (it's strict about non-loopback). If so, add the
+> `*.ts.net` host to the server's origin allowlist (see `server/config.js` /
+> `server/index.js` origin checks) — a one-line change. Confirm when it's running.
+
+### Fallback: Remote Control
+If you'd rather not use Tailscale, watch the PC via **Remote Control** from the phone.
+Either way, **don't bind the office to the LAN** — the server refuses non-loopback on
+purpose (every route is open on localhost by design, so a LAN bind would expose your
+prompts, Claude's replies and the agents' tasks to the network).
 
 ---
 
