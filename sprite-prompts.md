@@ -66,10 +66,14 @@ Small bipedal raccoon in an orange-and-blue flight/jumpsuit, cocky stance, maybe
 gadget or tool in hand. Fast, scrappy, clever-engineer energy. Big expressive eyes.
 
 ## 10. 🫅 Boss — Calmac (you)
-> ⚠️ Placeholder — **confirm how you want to appear.** A sky-god / commander the
-> heroes look up to. Suggested default until you say otherwise: a regal silhouette
-> on a throne-like command chair, crown or headset, neutral palette with a gold
-> accent, calm authoritative posture. **Tell me your preferred look and I'll finalize this block.**
+Young man, late teens / early twenties, with short tousled wavy dirty-blond hair, a
+light faint moustache, light stubble, and small stud earrings. Calm, confident,
+slightly cocky expression — this is the boss the heroes look up to. **Fit (streetwear
+"baggy" style):** an oversized plain grey hoodie over a white tee, baggy light-grey
+sweatpants, and clean sneakers; optionally a grey patterned durag or beanie. Give him
+one subtle "sky-god / commander" marker so he reads as the boss — a faint gold glow
+or a small floating gold crown above the head — but keep the outfit the real hero.
+Same chibi pixel style as the rest of the crew.
 
 ---
 
