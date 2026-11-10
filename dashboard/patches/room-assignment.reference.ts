@@ -1,0 +1,20 @@
+// === Suggested desk room per agent (Claude-Office RoomId) ===
+// Where to apply this depends on how the build assigns assignedRoom
+// (see agentManager.ts / server). Use as the intended layout.
+//   boss (Calmac): ceo-office  [Central Core]
+//   batman               -> main-office      [Watchtower]
+//   martian-manhunter    -> main-office      [Watchtower]
+//   iron-man             -> main-office      [Watchtower]
+//   deadpool             -> main-office      [Watchtower]
+//   doctor-strange       -> main-office      [Watchtower]
+//   spider-man           -> main-office      [Watchtower]
+//   doctor-doom          -> server-room      [The Lair]
+//   ultron               -> server-room      [The Lair]
+//   green-goblin         -> server-room      [The Lair]
+//   loki                 -> server-room      [The Lair]
+//   venom                -> server-room      [The Lair]
+//   alfred               -> manager-office   [Central Core]
+//   nightcrawler         -> meeting-room     [Game-Dev]
+//   hal-jordan           -> meeting-room     [Game-Dev]
+//   uatu                 -> meeting-room     [Game-Dev]
+//   rocket-raccoon       -> meeting-room     [Game-Dev]
