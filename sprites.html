@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070a12">
+<title>Calmac's Core — Sprite Vault</title>
+<style>
+  :root{--bg:#0a0e18;--card:#111829;--line:#20304f;--ink:#e9eefc;--dim:#9fb0d4;--hero:#5ad1ff;--build:#49e0a0;--break:#ff6b6b}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1100px 600px at 50% -10%,#16213c,#070a12);color:var(--ink);font-family:'Segoe UI',system-ui,sans-serif;font-size:16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
+  .back{display:inline-block;color:var(--hero);text-decoration:none;font-size:14px;margin-bottom:16px}
+  h1{font-size:28px;letter-spacing:2px;margin:0 0 4px}
+  h1 span{color:var(--hero)}
+  .tag{color:var(--dim);font-size:15px;margin-bottom:8px}
+  .hint{color:var(--dim);font-size:14px;background:#0e1626;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0 24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .card img{width:100%;height:auto;image-rendering:pixelated;background:#fff;border-radius:8px}
+  .nm{font-weight:700;margin-top:10px;font-size:16px}
+  .role{color:var(--dim);font-size:13px}
+  .count{color:var(--hero);font-size:14px;margin:6px 0 0}
+  h2{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:7px;margin:34px 0 12px}
+  .todo{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:13px;padding:5px 11px;border-radius:20px;border:1px dashed var(--line);color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&lsaquo; Calmac's Core</a>
+  <h1>CALMAC'S <span>CORE</span> — SPRITE VAULT</h1>
+  <div class="tag">Your generated character sprites, saved and accessible from any device.</div>
+  <div class="count">7 of 16 heroes done</div>
+  <div class="hint">💾 <b>To grab any sprite:</b> press-and-hold (phone/tablet) or right-click → “Save image…”. All are 1536×1024, 4-pose sheets, ready for the extract script.</div>
+
+  <div class="grid">
+    <div class="card"><img src="sprites/batman.webp" alt="Batman"><div class="nm">🦇 Batman</div><div class="role">Leader / Strategist</div></div>
+    <div class="card"><img src="sprites/iron-man.webp" alt="Iron Man"><div class="nm">🔴 Iron Man</div><div class="role">Builder</div></div>
+    <div class="card"><img src="sprites/martian-manhunter.webp" alt="Martian Manhunter"><div class="nm">🔮 Martian Manhunter</div><div class="role">Recon / Research</div></div>
+    <div class="card"><img src="sprites/deadpool.webp" alt="Deadpool"><div class="nm">🔆 Deadpool</div><div class="role">Creative copy</div></div>
+    <div class="card"><img src="sprites/doctor-strange.webp" alt="Doctor Strange"><div class="nm">🪄 Doctor Strange</div><div class="role">Technical writer</div></div>
+    <div class="card"><img src="sprites/doctor-doom.webp" alt="Doctor Doom"><div class="nm">🟢 Doctor Doom</div><div class="role">The Critic</div></div>
+    <div class="card"><img src="sprites/ultron.webp" alt="Ultron"><div class="nm">🤖 Ultron</div><div class="role">Systematic breaker</div></div>
+  </div>
+
+  <h2>Still to generate (9 + boss)</h2>
+  <div class="todo">
+    <span class="chip">🎃 Green Goblin</span>
+    <span class="chip">🐍 Loki</span>
+    <span class="chip">🖤 Venom</span>
+    <span class="chip">🎩 Alfred</span>
+    <span class="chip">🕷️ Spider-Man</span>
+    <span class="chip">🔵 Nightcrawler</span>
+    <span class="chip">💚 Green Lantern</span>
+    <span class="chip">👁️ Uatu</span>
+    <span class="chip">🦝 Rocket Raccoon</span>
+    <span class="chip">🧑‍💼 Boss (you)</span>
+  </div>
+</div>
+</body>
+</html>
