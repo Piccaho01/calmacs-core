@@ -636,6 +636,8 @@ function start(data){
   if(data&&data.items) ok=adopt(data);
   if(!ok){ try{ok=adopt(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){} }
   if(data&&data.draft){msg.value=data.draft;}
+  // The Desk greets by default: only keep a restored thread while the core is actively up.
+  if(ok && !S.coreUp){ S.items=[]; S.awake=[]; S.updated=Date.now(); }
   renderRooms(); $('deskav').innerHTML=deskAvatars(); renderState(); renderLog(); grow();
   if(window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
   initCloud(); getSample();
