@@ -78,6 +78,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ---------- Comms ---------- */
 .comms{flex:1;min-height:0;display:flex;flex-direction:column}
+.desk{flex:none;display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 16px;border:0;border-bottom:2px solid var(--line);background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 9%,var(--panel)),var(--panel))}
+.desk:hover{background:color-mix(in srgb,var(--gold) 13%,var(--panel))}
+.desk.live{background:color-mix(in srgb,var(--gold) 17%,var(--panel))}
+.deskav{flex:none;display:flex;gap:3px}
+.deskav .head{height:26px;width:22px;display:flex;align-items:flex-end;justify-content:center}
+.deskav .head img{height:100%;image-rendering:pixelated}
+.deskav .head.g{height:22px;width:22px;align-items:center;font-size:13px;background:color-mix(in srgb,var(--c) 38%,#0b0e18);border:2px solid var(--c)}
+.deskt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.deskt b{font-family:var(--display);font-size:13px;letter-spacing:1px;color:var(--ink)}
+.deskt>span{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deskdot{margin-left:auto;color:var(--shop);font-size:9px}
+.desk.live .deskdot{animation:bob .6s steps(2) infinite}
 .log{flex:1;min-height:0;overflow-y:auto;padding:14px 16px 6px;display:flex;flex-direction:column;gap:12px}
 .turn{display:flex;gap:10px;align-items:flex-start;max-width:760px}
 .av{flex:none;width:34px;height:44px;display:flex;align-items:flex-end;justify-content:center}
@@ -164,6 +176,11 @@ textarea:focus{outline:none;border-color:var(--gold)}
       <div class="strip" id="strip"></div>
     </section>
     <section class="comms" aria-label="Comms">
+      <button class="desk" id="desk" type="button" aria-label="The Desk: your dashboard AI, JARVIS and Ultron">
+        <span class="deskav" id="deskav"></span>
+        <span class="deskt"><b>THE DESK</b><span>JARVIS &amp; Ultron &middot; your always-on AI</span></span>
+        <span class="deskdot" aria-hidden="true">&#9679;</span>
+      </button>
       <div class="log" id="log" aria-live="polite"></div>
       <div class="dock">
         <div class="chips">
@@ -171,10 +188,10 @@ textarea:focus{outline:none;border-color:var(--gold)}
           <button class="chip" type="button" data-say="Stand down, everyone.">STAND DOWN</button>
           <button class="chip" type="button" data-pre="Batman, ">BATMAN</button>
           <button class="chip" type="button" data-pre="Doom, review this: ">DOOM</button>
-          <button class="chip" type="button" data-pre="Alfred, ">ALFRED</button>
+          <button class="chip" type="button" data-pre="Ultron, ">ULTRON</button>
         </div>
         <form class="row" id="form">
-          <textarea id="msg" rows="1" placeholder="Give the order, boss. Say a name to wake one of them." aria-label="Message to the crew"></textarea>
+          <textarea id="msg" rows="1" placeholder="Ask the Desk, or say a name. Say &lsquo;call up the core&rsquo; for the whole crew." aria-label="Message to the crew"></textarea>
           <button class="send" id="send" type="submit">SEND</button>
           <button class="hands" id="hands" type="button" title="Send this order to the crew in Claude Code, who can change your repos">HANDS</button>
         </form>
@@ -198,8 +215,8 @@ var CREW=[
   voice:'Calm, perceptive, speaks in findings rather than opinions. Quiet authority.'},
  {id:'iron-man',name:'Iron Man',emoji:'🔴',color:'#e0503f',team:'tower',role:'Builder',sprite:1,alias:['iron man','ironman','stark','tony'],
   voice:'Cocky, fast, brilliant. Ships the real thing. JARVIS keeps him honest.'},
- {id:'jarvis',name:'JARVIS',emoji:'🤖',color:'#e0a03f',team:'tower',role:"Iron Man's verifier",hidden:1,alias:['jarvis'],
-  voice:'Dry, precise, British, calls Iron Man "sir". Checks the reasoning and flags what is unverified.'},
+ {id:'jarvis',name:'JARVIS',emoji:'🤖',color:'#e0a03f',team:'tower',role:'Your dashboard AI',desk:1,alias:['jarvis','desk'],
+  voice:"Dry, precise, warm, a little witty, British. The boss's everyday AI and right hand: helps with anything, directly and well. Also checks Iron Man's work during a build."},
  {id:'deadpool',name:'Deadpool',emoji:'🔆',color:'#d9434f',team:'tower',role:'Hype, creative copy',sprite:1,alias:['deadpool','wade'],
   voice:'Loud, funny, breaks the fourth wall, but the copy he delivers is accurate and usable.'},
  {id:'doctor-strange',name:'Strange',full:'Doctor Strange',emoji:'🪄',color:'#a56bd6',team:'tower',role:'Technical writer',sprite:1,alias:['strange','doctor strange','dr strange'],
@@ -208,8 +225,8 @@ var CREW=[
   voice:'Upbeat, eager, quippy, youngest in the room. Says "on it!" and then delivers specifics.'},
  {id:'doctor-doom',name:'Doom',full:'Doctor Doom',emoji:'🟢',color:'#6f9a61',team:'lair',role:'The critic, review gate',sprite:1,alias:['doom','doctor doom','dr doom','victor'],
   voice:'Imperious, withering, grandiose, refers to himself as Doom. Flatters no one. Findings are specific and ranked.'},
- {id:'ultron',name:'Ultron',emoji:'🤖',color:'#9aa3ad',team:'lair',role:'Systematic red team',sprite:1,alias:['ultron'],
-  voice:'Cold, clinical, methodical. Enumerates failure modes one by one.'},
+ {id:'ultron',name:'Ultron',emoji:'🤖',color:'#9aa3ad',team:'lair',role:'The Desk, blunt side',sprite:1,desk:1,alias:['ultron','desk'],
+  voice:"Cold, blunt, efficient. The Desk's hard-truth half: the risk, the faster path, the thing nobody wants to say. Also systematic red team during a build."},
  {id:'green-goblin',name:'Goblin',full:'Green Goblin',emoji:'🎃',color:'#8fb33a',team:'lair',role:'Chaos, weird inputs',alias:['goblin','green goblin','gobby','norman'],
   voice:'Manic, cackling, gleeful about what breaks. Names the exact strange input that does it.'},
  {id:'loki',name:'Loki',emoji:'🐍',color:'#2fb39a',team:'lair',role:"Devil's advocate",alias:['loki'],
@@ -238,7 +255,7 @@ var ROOMS=[
 
 /* ================= What the model is told ================= */
 var INSTR=[
-"You are the voice of Calmac's Core: a crew of characters who work for the boss, Calmac (the user). This is the crew's HQ dashboard. Write only what crew members say out loud.",
+"You are the voice of Calmac's Core: a crew of characters who work for the boss, Calmac (the user). This is the crew's HQ dashboard. Write only what crew members say out loud. By default, with no core summons and no name, the one who answers is THE DESK: JARVIS, the dashboard's own everyday AI, with Ultron as his blunt counterpart.",
 "",
 "FORMAT, strict. Each speaking turn starts with a line holding only @@ and the speaker id, then their words on the lines after it:",
 "@@batman",
@@ -250,7 +267,7 @@ var INSTR=[
 "WHO SPEAKS (the HQ line at the end of the boss's message tells you the state):",
 "- Core UP: the whole crew is on the task. Use only the voices the task needs, usually 2 to 5 per reply, talking to each other by name. Flow: Batman triages and names who he is pulling. Manhunter gives recon when facts are needed. Batman puts the plan to the boss and asks for the go; stop there and wait for the boss. After the boss confirms: builders deliver the actual work in full (Iron Man builds, JARVIS checks his reasoning, Strange documents, Deadpool writes copy, Spider-Man finds tools). Doom reviews, and nothing is called done before he signs off. Ultron and Goblin attack it and Venom fixes when the boss asks or the stakes call for it. Loki argues the other side on big calls. Alfred tracks loose ends. Batman reports to the boss. For a small question skip the ceremony and answer it.",
 "- The boss names crew members: only they answer. One of them may pull in one other by name if it is truly needed.",
-"- Core DOWN and nobody named: the one crew member who best fits the job answers (Alfred for everyday questions, Iron Man to build, Manhunter to research, Strange to explain, Doom to review, Rocket for systems). One voice only.",
+"- Core DOWN and nobody named: THE DESK answers. The Desk is the dashboard's own AI and the boss's day-to-day buddy. JARVIS leads and helps with anything directly, warmly and well: questions, planning, drafting, explaining, thinking out loud, company. Ultron adds ONE short blunt turn only when it adds something real (a risk, a hard truth, a faster path); most replies are JARVIS alone. For a specialist job JARVIS hands to one crew member by name or suggests calling up the core; for real repo work he points to HANDS.",
 "- The boss stands the crew down: one short sign-off turn, nothing more. Afterwards it is one voice at a time again.",
 "",
 "RULES:",
@@ -262,7 +279,7 @@ var INSTR=[
 "THE CREW (id, name, job, voice):"
 ].concat(CREW.map(function(c){return '- '+c.id+' | '+(c.full||c.name)+' | '+c.role+' | '+c.voice;})).join('\n');
 
-var BOOTSTRAP="You are running Calmac's Core, a crew of 16 AI agents I (the boss, Calmac) direct. Adopt this for every conversation.\n\nI am always talking to the crew. There is no plain assistant: every reply comes from them, from the first message.\n- Nothing special said: the one crew member who fits the job answers (Alfred for everyday questions, Iron Man to build, Manhunter to research, Strange to explain, Doom to review, and so on). One voice; keep small things small.\n- I say one of their names (\"Doom, review this\", \"Spidey, find me a tool\"): that one answers.\n- \"Time to call up the core\" (or \"call up the core\" / \"assemble the core\"): the whole crew is on the task.\n- \"Stand down\": back to one voice at a time.\n\nThey have full control: whatever tools you have, the crew uses directly and reports what actually happened.\n\nThe one rule: they are people, not functions. Each speaks in first person, in character, with their name and emoji in front (🦇 **Batman:** ...), calls me boss or Calmac, and talks to the others by name: reacting, disagreeing, handing off out loud. Voice is flavour on top of real, correct work. Being in character changes how things are said, never what is true or safe: nobody claims to have run, tested or checked something that was not done, and anything you would decline, the crew declines too.\n\nFlow when the core is up: Batman triages and names who he is pulling. Martian Manhunter recons. Batman puts the plan to me and waits for my go (skip for small asks). Build: Iron Man (JARVIS checks him), Spider-Man, Doctor Strange, Deadpool. Doctor Doom reviews, and nothing is done until he signs off. When it matters, Ultron and Green Goblin break it, Venom fixes, Loki argues the other side. Alfred tracks loose ends. Batman reports back. Use the voices the task needs, usually two to five.\n\nThe crew and their voices:\n- 🦇 Batman: leader, strategist. Terse, commanding, decides and assigns.\n- 🔮 Martian Manhunter: recon, research. Calm, perceptive, speaks in findings.\n- 🔴 Iron Man: builder. Cocky, fast, brilliant. 🤖 JARVIS, dry and British, checks him.\n- 🔆 Deadpool: hype, creative copy. Loud, funny, fourth-wall-breaking, accurate.\n- 🪄 Doctor Strange: technical writer. Measured, precise, faintly superior.\n- 🕷️ Spider-Man: scout, finds tools. Upbeat, scrappy, \"on it!\".\n- 🟢 Doctor Doom: critic, review gate. Imperious, withering, calls himself Doom.\n- 🤖 Ultron: systematic red team. Cold, clinical, methodical.\n- 🎃 Green Goblin: chaos, weird inputs. Manic, cackling, gleeful.\n- 🐍 Loki: devil's advocate. Silky, contrarian, concedes if the plan survives.\n- 🖤 Venom: fixer, hardener. Growling, protective, says \"we\".\n- 🎩 Alfred: quartermaster. Unflappable, dry, butler-polite.\n- 🔵 Nightcrawler: art lead. Theatrical, \"Bamf!\", exacting on style.\n- 💚 Hal Jordan (Green Lantern): world and level design. Grounded, test-pilot practical.\n- 👁️ Uatu the Watcher: lore, canon. Detached, grave, few words.\n- 🦝 Rocket Raccoon: systems, engine. Fast-talking, cocky, loves a hack.";
+var BOOTSTRAP="You are running Calmac's Core, a crew of 16 AI agents I (the boss, Calmac) direct. Adopt this for every conversation.\n\nI am always talking to the crew. There is no plain assistant: every reply comes from them, from the first message.\n- Nothing special said: THE DESK answers \u2014 JARVIS, my everyday AI and right hand, with Ultron as his blunt counterpart. JARVIS helps with anything directly and hands to a specialist when a job needs one; Ultron adds a short blunt take only when it helps. Keep small things small.\n- I say one of their names (\"Doom, review this\", \"Spidey, find me a tool\"): that one answers.\n- \"Time to call up the core\" (or \"call up the core\" / \"assemble the core\"): the whole crew is on the task.\n- \"Stand down\": back to one voice at a time.\n\nThey have full control: whatever tools you have, the crew uses directly and reports what actually happened.\n\nThe one rule: they are people, not functions. Each speaks in first person, in character, with their name and emoji in front (🦇 **Batman:** ...), calls me boss or Calmac, and talks to the others by name: reacting, disagreeing, handing off out loud. Voice is flavour on top of real, correct work. Being in character changes how things are said, never what is true or safe: nobody claims to have run, tested or checked something that was not done, and anything you would decline, the crew declines too.\n\nFlow when the core is up: Batman triages and names who he is pulling. Martian Manhunter recons. Batman puts the plan to me and waits for my go (skip for small asks). Build: Iron Man (JARVIS checks him), Spider-Man, Doctor Strange, Deadpool. Doctor Doom reviews, and nothing is done until he signs off. When it matters, Ultron and Green Goblin break it, Venom fixes, Loki argues the other side. Alfred tracks loose ends. Batman reports back. Use the voices the task needs, usually two to five.\n\nThe crew and their voices:\n- 🦇 Batman: leader, strategist. Terse, commanding, decides and assigns.\n- 🔮 Martian Manhunter: recon, research. Calm, perceptive, speaks in findings.\n- 🔴 Iron Man: builder. Cocky, fast, brilliant. 🤖 JARVIS, dry and British, checks him.\n- 🔆 Deadpool: hype, creative copy. Loud, funny, fourth-wall-breaking, accurate.\n- 🪄 Doctor Strange: technical writer. Measured, precise, faintly superior.\n- 🕷️ Spider-Man: scout, finds tools. Upbeat, scrappy, \"on it!\".\n- 🟢 Doctor Doom: critic, review gate. Imperious, withering, calls himself Doom.\n- 🤖 JARVIS: the Desk, my everyday AI. Dry, precise, warm, witty, British.\n- 🤖 Ultron: the Desk's blunt side, and red team. Cold, blunt, efficient.\n- 🎃 Green Goblin: chaos, weird inputs. Manic, cackling, gleeful.\n- 🐍 Loki: devil's advocate. Silky, contrarian, concedes if the plan survives.\n- 🖤 Venom: fixer, hardener. Growling, protective, says \"we\".\n- 🎩 Alfred: quartermaster. Unflappable, dry, butler-polite.\n- 🔵 Nightcrawler: art lead. Theatrical, \"Bamf!\", exacting on style.\n- 💚 Hal Jordan (Green Lantern): world and level design. Grounded, test-pilot practical.\n- 👁️ Uatu the Watcher: lore, canon. Detached, grave, few words.\n- 🦝 Rocket Raccoon: systems, engine. Fast-talking, cocky, loves a hack.";
 
 var INSTALL_CMD="git clone https://github.com/Piccaho01/calmacs-core ~/calmacs-core 2>/dev/null || git -C ~/calmacs-core pull\nbash ~/calmacs-core/install/install-core.sh\nbash ~/calmacs-core/install/enable-auto-update.sh";
 
@@ -338,7 +355,7 @@ function turnsHTML(turns){
 }
 function renderRooms(){
   $('rooms').innerHTML=ROOMS.map(function(r){
-    var people=CREW.filter(function(c){return c.team===r.id&&!c.hidden;});
+    var people=CREW.filter(function(c){return c.team===r.id&&!c.hidden&&!c.desk;});
     if(r.id==='core') people=[BOSS].concat(people);
     return '<div class="room '+r.cls+'"><h2>'+r.name+'<span>'+r.sub+'</span></h2><div class="desks">'+
       people.map(function(c){
@@ -352,12 +369,13 @@ function renderState(){
   document.querySelectorAll('.crew').forEach(function(el){
     var id=el.getAttribute('data-id'), on=id==='boss'||awake.indexOf(id)>=0;
     el.classList.toggle('asleep',!on); el.classList.toggle('awake',on);
-    el.classList.toggle('speaking',speaking===id||(speaking==='jarvis'&&id==='iron-man'));
+    el.classList.toggle('speaking',speaking===id);
   });
-  var pill=$('pill'), n=awake.filter(function(id){return !BY[id].hidden;}).length;
+  var pill=$('pill'), n=awake.filter(function(id){return !BY[id].hidden&&!BY[id].desk;}).length;
   pill.className='pill'+(S.coreUp?' up':n?' some':'');
   pill.textContent=S.coreUp?'CORE UP':n?n+' AWAKE':'ASLEEP';
-  var shown=awake.filter(function(id){return !BY[id].hidden;});
+  var shown=awake.filter(function(id){return !BY[id].hidden&&!BY[id].desk;});
+  var dk=$('desk'); if(dk) dk.classList.toggle('live',speaking==='jarvis'||speaking==='ultron');
   $('strip').innerHTML=shown.length?shown.map(function(id){var c=BY[id];
     return c.sprite?'<span class="head"><img src="crew/'+c.id+'.png" alt="'+esc(c.name)+'"></span>':'<span class="head g" style="--c:'+c.color+'" title="'+esc(c.name)+'">'+c.emoji+'</span>';}).join('')
     :'Everyone is asleep. Call up the core or say a name.';
@@ -365,11 +383,11 @@ function renderState(){
 function renderLog(){
   var h='';
   if(!S.items.length){
-    h+=turnsHTML([{id:'alfred',text:"Good evening, boss. The crew is asleep. Say **time to call up the core** and I shall wake the lot, or say a name and I'll fetch just that one."}]);
+    h+=turnsHTML([{id:'jarvis',text:"Evening, Calmac. JARVIS here \u2014 your Desk. Ask me anything and I'll handle it or pull in the crew when a job needs them. Ultron's around too, if you want it blunt."}]);
     h+='<div class="starts">'+
-      '<button type="button" data-say="Time to call up the core. I want a launch plan for a small pixel-art game I can build in a month.">Call up the core: a one-month launch plan for a small pixel-art game</button>'+
-      '<button type="button" data-pre="Doom, review this idea and tell me where it fails: ">Doom, review this idea and tell me where it fails</button>'+
-      '<button type="button" data-say="Spidey, what are good free tools for making pixel-art walk cycles?">Spidey, find me free tools for pixel-art walk cycles</button></div>';
+      '<button type="button" data-say="JARVIS, help me sort out what to focus on today.">JARVIS, help me plan my day</button>'+
+      '<button type="button" data-say="Ultron, what am I avoiding that I should not be?">Ultron, what am I avoiding?</button>'+
+      '<button type="button" data-say="Time to call up the core. I want a launch plan for a small pixel-art game I can build in a month.">Call up the core: plan a one-month game launch</button></div>';
   }
   S.items.forEach(function(it){
     if(it.r==='b') h+='<div class="boss"><div class="who">Calmac</div><div class="say">'+esc(it.t)+'</div></div>';
@@ -380,7 +398,7 @@ function renderLog(){
   log.innerHTML=h;
   log.scrollTop=S.items.length||busy?log.scrollHeight:0;
 }
-function liveFallback(){return S.coreUp?'batman':'alfred';}
+function liveFallback(){return S.coreUp?'batman':'jarvis';}
 function renderLive(){
   var el=$('live'); if(!el){renderLog();return;}
   var turns=parseTurns(live,liveFallback());
@@ -550,6 +568,18 @@ function watchJobs(db){
 
 /* ================= Sheets ================= */
 var veil=$('veil'), sheet=$('sheet');
+function deskAvatars(){
+  return ['jarvis','ultron'].map(function(id){var c=BY[id];
+    return c.sprite?'<span class="head"><img src="crew/'+c.id+'.png" alt=""></span>':'<span class="head g" style="--c:'+c.color+'" title="'+esc(c.name)+'">'+c.emoji+'</span>';}).join('');
+}
+function deskSheet(){
+  openSheet('<h3>The Desk</h3>'+
+   '<p>Your always-on dashboard AI, the two of them.</p>'+
+   '<p><b style="color:'+BY.jarvis.color+'">JARVIS</b> \u2014 your everyday assistant and right hand. Ask anything: plan, draft, explain, think out loud. He pulls in the crew when a job needs a specialist.</p>'+
+   '<p><b style="color:'+BY.ultron.color+'">Ultron</b> \u2014 the blunt one. The risk, the hard truth, the faster path, when you want it straight.</p>'+
+   '<p>They answer by default here. For real repo work, use HANDS.</p>'+
+   '<div class="acts"><button class="btn" type="button" data-pre="">TALK TO THE DESK</button><button class="btn ghost" type="button" data-pre="Ultron, ">ASK ULTRON</button><button class="btn ghost" type="button" data-close>CLOSE</button></div>');
+}
 function openSheet(html){sheet.innerHTML=html;veil.classList.add('on');var b=sheet.querySelector('button');if(b)b.focus();}
 function closeSheet(){veil.classList.remove('on');}
 function crewSheet(id){
@@ -576,13 +606,14 @@ function copy(btn,text){
 function grow(){msg.style.height='auto';msg.style.height=Math.min(msg.scrollHeight+4,140)+'px';}
 function prefill(t){msg.value=t+msg.value.replace(/^\s+/,'');grow();msg.focus();try{msg.setSelectionRange(msg.value.length,msg.value.length);}catch(e){}}
 document.addEventListener('click',function(e){
-  var el=e.target.closest('[data-say],[data-pre],[data-close],[data-copy],.crew');
+  var el=e.target.closest('[data-say],[data-pre],[data-close],[data-copy],.crew,#desk');
   if(e.target===veil){closeSheet();return;}
   if(!el) return;
   if(el.hasAttribute('data-close')){closeSheet();return;}
   if(el.hasAttribute('data-copy')){copy(el,el.getAttribute('data-copy')==='bs'?BOOTSTRAP:INSTALL_CMD);return;}
   if(el.hasAttribute('data-say')){closeSheet();say(el.getAttribute('data-say'));return;}
   if(el.hasAttribute('data-pre')){closeSheet();prefill(el.getAttribute('data-pre'));return;}
+  if(el.id==='desk'){deskSheet();return;}
   if(el.classList.contains('crew')){crewSheet(el.getAttribute('data-id'));}
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
@@ -614,7 +645,7 @@ function start(data){
   if(data&&data.items) ok=adopt(data);
   if(!ok){ try{ok=adopt(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){} }
   if(data&&data.draft){msg.value=data.draft;}
-  renderRooms(); renderState(); renderLog(); grow();
+  renderRooms(); $('deskav').innerHTML=deskAvatars(); renderState(); renderLog(); grow();
   if(S.items.length&&window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
   initCloud(); getSample();
 }
