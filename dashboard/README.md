@@ -15,7 +15,7 @@ The patch blocks are generated from the roster — edit the roster, regenerate, 
 hand-edit the patches.
 
 Related elsewhere in the repo:
-- `agents-draft/` — the 16 agent definitions (→ `~/.claude/agents/`).
+- `agents/` — the 16 agent definitions (→ `~/.claude/agents/`).
 - `sprite-prompts.md` + `sprites/` — the character art pipeline.
 - `core-protocol.md` + `CLAUDE.md` — the "call up the core" behavior.
 

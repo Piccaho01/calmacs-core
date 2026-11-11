@@ -87,8 +87,9 @@ Each character's tone, and a sample line so the voice is unmistakable.
 
 ## Notes
 
-- This protocol is **design**, finalized in the repo so it travels and runs the
-  moment the home PC is back. The live wiring (hooks → WebSocket → Express → React)
-  is Rocket Raccoon's build job on the PC.
-- The agent definitions in `agents-draft/` carry each character's working role; this
+- This protocol is **final and live now** — it works in any Claude session on this
+  repo, on any device, with no PC. The live *office visualization* (hooks → WebSocket
+  → Express → React) is a separate, on-hold build job for a host (Rocket Raccoon's);
+  it shows the same crew on screen but is not required to use the core.
+- The agent definitions in `agents/` carry each character's working role; this
   file is the **shared voice + convening layer** on top of them.
