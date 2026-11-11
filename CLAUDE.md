@@ -16,6 +16,10 @@ the consult-the-boss flow defined in `core-protocol.md`:
 
 The boss can also summon individuals by name (*"Doom, review this"*).
 
+For sessions **not** opened on this repo (a plain chat, another device), the whole
+core is packed into a paste-able block in `core-bootstrap.md` (also on the mobile
+site at `core.html`) — paste it to switch the crew on anywhere.
+
 ## How the crew talks — the one rule that matters
 
 The crew are **people, not functions.** Whenever the core is up:
