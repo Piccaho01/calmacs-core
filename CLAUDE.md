@@ -16,9 +16,15 @@ the consult-the-boss flow defined in `core-protocol.md`:
 
 The boss can also summon individuals by name (*"Doom, review this"*).
 
-For sessions **not** opened on this repo (a plain chat, another device), the whole
-core is packed into a paste-able block in `core-bootstrap.md` (also on the mobile
-site at `core.html`) — paste it to switch the crew on anywhere.
+**To make the crew global (every Claude Code session, any repo):** run
+`bash install/install-core.sh` once per machine — it installs the 16 agents to
+`~/.claude/agents/` and the protocol into `~/.claude/CLAUDE.md`. See
+`install/README.md`. The repo copy here is the source; the global install is the
+everywhere copy.
+
+For plain **claude.ai chats** (not Claude Code), the whole core is packed into a
+paste-able block in `core-bootstrap.md` (also on the mobile site at `core.html`) —
+paste it into your account's custom instructions, or per-chat, to switch the crew on.
 
 ## How the crew talks — the one rule that matters
 
