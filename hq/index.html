@@ -112,6 +112,8 @@ textarea{flex:1;min-width:0;resize:none;background:var(--bg);color:var(--ink);bo
 textarea:focus{outline:none;border-color:var(--gold)}
 .send{flex:none;background:var(--gold);color:#1a1404;border:0;padding:0 16px;height:44px;font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:1px}
 .send.stop{background:var(--lair);color:#fff}
+.hands{flex:none;background:none;color:var(--tower);border:2px solid var(--tower);padding:0 10px;height:44px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:1px}
+.hands:disabled{opacity:.45;cursor:default}
 .send:disabled{opacity:.45;cursor:default}
 .fine{margin:6px 0 0;font-size:12px;color:var(--dim)}
 
@@ -174,8 +176,9 @@ textarea:focus{outline:none;border-color:var(--gold)}
         <form class="row" id="form">
           <textarea id="msg" rows="1" placeholder="Give the order, boss. Say a name to wake one of them." aria-label="Message to the crew"></textarea>
           <button class="send" id="send" type="submit">SEND</button>
+          <button class="hands" id="hands" type="button" title="Send this order to the crew in Claude Code, who can change your repos">HANDS</button>
         </form>
-        <p class="fine" id="fine">Here the crew thinks, plans, writes, reviews and drafts code. Hands-on repo work happens in Claude Code, where the same crew answers.</p>
+        <p class="fine" id="fine">SEND talks to the crew here: they think, plan, write and review. HANDS passes the order to the crew in Claude Code, who can change your GitHub repos and report back here.</p>
       </div>
     </section>
   </div>
@@ -252,7 +255,7 @@ var INSTR=[
 "",
 "RULES:",
 "- First person, in character. Call the user boss or Calmac. Voice is flavour on top of substance: be correct, specific and useful. Give the real answer, plan, draft or code, never a promise of one.",
-"- In this dashboard the crew can think, plan, write, review and draft code. They cannot run code, open files, browse the web or change anything. Never say something was run, tested, installed, measured or looked up. Say what is unverified. When a job needs hands on a repo or a machine, Batman tells the boss to take it to Claude Code, where the same crew answers.",
+"- In this dashboard the crew can think, plan, write, review and draft code. They cannot run code, open files, browse the web or change anything. Never say something was run, tested, installed, measured or looked up. Say what is unverified. When a job needs hands on a repo or a machine, tell the boss to press HANDS: that sends the order to the crew's Claude Code session, which has GitHub access, does the work and reports back in this log. A turn that begins with [HANDS REPORT] in the history is that report of real work done.",
 "- Keep talk tight: one to four sentences a turn unless the turn is delivering work product.",
 "- They are people. They react to each other, disagree when they have reason, and hand off out loud.",
 "",
@@ -264,7 +267,7 @@ var BOOTSTRAP="You are running Calmac's Core, a crew of 16 AI agents I (the boss
 var INSTALL_CMD="git clone https://github.com/Piccaho01/calmacs-core ~/calmacs-core 2>/dev/null || git -C ~/calmacs-core pull\nbash ~/calmacs-core/install/install-core.sh\nbash ~/calmacs-core/install/enable-auto-update.sh";
 
 /* ================= State ================= */
-var S={items:[],coreUp:false,awake:[],updated:0};
+var S={items:[],coreUp:false,awake:[],updated:0,jobs:{}};
 var busy=false, speaking=null, ctl=null, live='';
 var $=function(id){return document.getElementById(id);};
 var log=$('log'), msg=$('msg'), sendBtn=$('send');
@@ -452,11 +455,12 @@ function finish(down){
 
 /* ================= Memory: this device, and across devices ================= */
 var LS='calmac-core-hq-v1', docRef=null, writing=false, dirty=false;
-function pack(){return {items:S.items.slice(-60),coreUp:S.coreUp,awake:S.awake.slice(),updated:S.updated};}
+function pack(){return {items:S.items.slice(-60),coreUp:S.coreUp,awake:S.awake.slice(),updated:S.updated,jobs:S.jobs};}
 function adopt(d){
   if(!d||!Array.isArray(d.items)) return false;
   S.items=d.items.filter(function(it){return it&&typeof it.t==='string'&&typeof it.r==='string';});
   S.coreUp=!!d.coreUp; S.awake=Array.isArray(d.awake)?d.awake.filter(function(id){return BY[id];}):[]; S.updated=+d.updated||0;
+  S.jobs=(d.jobs&&typeof d.jobs==='object')?JSON.parse(JSON.stringify(d.jobs)):{};
   return true;
 }
 function persist(){
@@ -472,6 +476,7 @@ function initCloud(){
     var db=r[0], user=r[1]; if(!db||!user) return;
     return user.id().then(function(uid){
       if(!uid) return;
+      watchJobs(db);
       docRef=db.doc('data/users/'+uid+'/thread');
       docRef.onSnapshot(function(snap){
         if(!snap.exists||snap.metadata.hasPendingWrites||busy) return;
@@ -480,6 +485,65 @@ function initCloud(){
       },function(){docRef=null;});
     });
   }).catch(function(){});
+}
+
+
+/* ================= Hands: orders to the crew in Claude Code ================= */
+var commentsP=null;
+function getComments(){
+  if(!commentsP) commentsP=(window.claude&&window.claude.use)?window.claude.use('comments').catch(function(){return null;}):Promise.resolve(null);
+  return commentsP;
+}
+function bytes(t){try{return new TextEncoder().encode(t).length;}catch(e){return t.length*3;}}
+function clip(t,max){ while(bytes(t)>max) t=t.slice(0,Math.floor(t.length*0.9)); return t; }
+function note(t,err){S.items.push({r:err?'e':'n',t:t});S.updated=Date.now();renderLog();persist();}
+function sendToHands(){
+  if(busy) return;
+  var typed=msg.value.trim(), lastBoss='', lastCrew='';
+  for(var i=S.items.length-1;i>=0;i--){ var it=S.items[i]; if(!lastCrew&&it.r==='c') lastCrew=it.t; if(!lastBoss&&it.r==='b'){lastBoss=it.t;break;} }
+  var order=typed||lastBoss;
+  if(!order){ note('Type the order first, then press HANDS.',true); return; }
+  var id='j'+Date.now().toString(36);
+  var text='[CORE JOB '+id+'] Order from the boss, sent from the HQ dashboard:\n'+clip(order,1500);
+  if(lastCrew) text+='\n\nWhat the crew said in the HQ just before:\n'+clip(lastCrew.replace(/^@@/gm,'- '),1700);
+  text+='\n\nDo the work, then write the report to this artifact\'s db at jobs/'+id+' (see CLAUDE.md, Dashboard jobs).';
+  var hb=$('hands'); hb.disabled=true;
+  getComments().then(function(c){
+    if(!c||!c.sendToClaude) throw {code:'absent'};
+    return c.canSendToClaude().catch(function(){return 'off';}).then(function(can){
+      if(can!=='available') throw {code:'cant',why:can};
+      return c.anchorFor($('log')).then(function(anchor){ return c.sendToClaude({anchor:anchor,text:text}); });
+    });
+  }).then(function(){
+    if(typed){ S.items.push({r:'b',t:typed}); msg.value=''; grow(); }
+    S.jobs[id]='sent';
+    note('Order sent to the hands (job '+id+'). The crew in Claude Code is on it. Their report will appear here; it can take a few minutes.');
+  }).catch(function(err){
+    var code=err&&err.code, why=err&&err.why;
+    if(code==='absent') note('HANDS is not available in this view. Open the HQ inside Claude (claude.ai or the app), signed in as its owner.',true);
+    else if(code==='cant'&&why==='no_session') note('No Claude Code session is listening for orders right now. Open a Claude Code session on calmacs-core and say "watch the HQ", then press HANDS again.',true);
+    else if(code==='cant') note('This view cannot send orders to Claude Code ('+why+').',true);
+    else if(code==='consent_required'||code==='forbidden') note('HANDS needs your permission to post the order as you. Press it again and allow it. Nothing was sent.',true);
+    else if(code==='claude_unavailable') note('The order could not reach Claude Code just now. Nothing was sent. Try again in a moment.',true);
+    else if(code==='rate_limited') note('Too many orders too quickly. Wait a minute, then press HANDS again.',true);
+    else note('The order may not have been sent'+(err&&err.message?' ('+String(err.message).slice(0,100)+')':'')+'. Check the comments on this page before sending it again.',true);
+  }).then(function(){hb.disabled=false;});
+}
+function watchJobs(db){
+  try{
+    db.collection('jobs').onSnapshot(function(snap){
+      var changed=false;
+      snap.docs.forEach(function(d){
+        var v=d.data(); if(!v||v.status!=='done'||typeof v.report!=='string') return;
+        if(S.jobs[d.id]==='done') return;
+        if(!S.jobs[d.id]) return;            /* not an order this thread sent */
+        S.jobs[d.id]='done'; changed=true;
+        var rep=v.report.indexOf('@@')>=0?v.report:'@@batman\n'+v.report;
+        S.items.push({r:'c',t:rep.replace(/^(@@[a-z-]+[ \t]*\n)/,'$1[HANDS REPORT] '),f:'batman'});
+      });
+      if(changed){S.updated=Date.now();renderState();renderLog();persist();}
+    },function(){});
+  }catch(e){}
 }
 
 /* ================= Sheets ================= */
@@ -533,6 +597,7 @@ msg.addEventListener('keydown',function(e){
 });
 $('hqToggle').addEventListener('click',function(){$('hq').classList.toggle('shut');});
 $('setupBtn').addEventListener('click',setupSheet);
+$('hands').addEventListener('click',sendToHands);
 var clearArmed=0;
 $('clearBtn').addEventListener('click',function(){
   var b=this;
