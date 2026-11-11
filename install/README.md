@@ -28,6 +28,26 @@ untouched. After it runs, open **any** Claude Code session anywhere and say
 
 To update after changes land: `git pull && bash install/install-core.sh`.
 
+### Make it self-updating (no manual re-run)
+Want the crew to stay current on its own? Run once:
+
+```bash
+bash install/enable-auto-update.sh
+```
+
+This adds a global **SessionStart hook** to `~/.claude/settings.json` that, on every
+Claude Code session start, pulls this repo clone and re-syncs `~/.claude/`
+(agents + protocol). Edit the crew in the repo, push, and every machine picks it up
+on its next session — no manual step. It's quiet, offline-safe (never blocks a
+session), idempotent, and leaves your other settings/hooks untouched.
+
+- The updater lives at `~/.claude/calmac-core/update.sh` and pulls from the clone you
+  ran this in — keep that clone around (e.g. `~/calmacs-core`).
+- **Disable:** remove the hook entry from `~/.claude/settings.json` and delete
+  `~/.claude/calmac-core/`.
+- This is **sync** (latest authored crew from the repo), not autonomous self-editing
+  — changes flow from the repo, so you stay in control.
+
 ---
 
 ## B) Every claude.ai chat (not Claude Code)
