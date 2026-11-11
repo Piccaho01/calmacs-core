@@ -370,7 +370,10 @@ function renderState(){
 function renderLog(){
   var h='';
   if(!S.items.length){
-    h+=turnsHTML([{id:'jarvis',text:"Evening, Calmac. JARVIS here \u2014 your Desk. Ask me anything; I'll pull in the crew when a job needs them."}]);
+    h+=turnsHTML([
+      {id:'jarvis',text:"Evening, Calmac. JARVIS here \u2014 your Desk. Ask me anything; I'll pull in the crew when a job needs them."},
+      {id:'ultron',text:"Ultron, as well. I give it to you straight. Say *call up the core* when you want the whole room."}
+    ]);
     h+='<div class="starts">'+
       '<button type="button" data-say="JARVIS, help me sort out what to focus on today.">Help me plan my day</button>'+
       '<button type="button" data-say="Ultron, what am I avoiding that I should not be?">Ultron, what am I avoiding?</button>'+
