@@ -1,24 +1,27 @@
 # calmacs-core
 
-The **Calmac's Core** plan and sprite vault, as a mobile-friendly web page so it's
-reachable from your iPhone and Samsung tablet while the home PC is down.
+**Calmac's Core**: a crew of 16 characters who work for the boss, and the HQ they
+live in.
 
-## Pages
+## Use it
 
-- `index.html` — landing hub
-- `plan.html` — the Build Spec (full plan)
-- `sprites.html` — the Sprite Vault (7 of 16 sprites so far)
-- `sprites/` — the sprite image sheets
+- **HQ dashboard** (iPhone, tablet, computer): https://claude.ai/artifact/8ZMUzbXZgyBPPWcNSFTPRP
+  Say "time to call up the core" or a name and the crew answers. Source in `hq/`.
+- **Claude chat**: paste `core-bootstrap.md` into claude.ai personal preferences once.
+- **Claude Code**: `bash install/install-core.sh` once per computer (and
+  `bash install/enable-auto-update.sh` to keep it current). Details in
+  `install/README.md`.
+- **Mobile reference site** (plan, sprites, copy page): https://Piccaho01.github.io/calmacs-core/
 
-## View it on your phone / tablet
+## What's in here
 
-Turn on **GitHub Pages** once, then open the link in any mobile browser:
-
-1. On GitHub, go to this repo → **Settings → Pages**.
-2. Under **Build and deployment → Source**, pick **Deploy from a branch**.
-3. Branch: `main` (or whichever branch holds these files), folder: `/ (root)` → **Save**.
-4. After a minute the page is live at:
-   `https://<your-username>.github.io/calmacs-core/`
-5. Open that URL on the iPhone and tablet → **Share → Add to Home Screen** for an app-like icon.
-
-No PC required — the page is served by GitHub.
+| Path | What |
+|---|---|
+| `agents/` | The 16 crew definitions |
+| `core-protocol.md` | How the crew is summoned, routed and voiced |
+| `hq/` | The HQ dashboard (published as a Claude artifact) |
+| `install/` | Global install and self-update for Claude Code |
+| `core-bootstrap.md` | Crew instructions for Claude chat |
+| `sprites/`, `sprite-prompts.md` | Character art and prompts for the rest |
+| `dashboard/` | Claude-Office overlay kit (on hold, needs a computer) |
+| `index.html`, `plan.html`, `sprites.html`, `core.html` | GitHub Pages site |

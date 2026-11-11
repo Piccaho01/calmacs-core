@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calmac's Core HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* One committed world: a night-shift pixel HQ. Rooms on one side, comms on the other; phone stacks them. */
+  color-scheme: dark;
+  --bg:#090b12; --panel:#111524; --panel2:#181d30; --line:#273049;
+  --ink:#e9ecf5; --dim:#8f97ad;
+  --tower:#56c8f5; --lair:#ef5a5f; --gold:#e2b93d; --shop:#6fd38c;
+  --display:'Pixelify Sans','Courier New',monospace;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.app{height:100%;display:flex;flex-direction:column;max-width:1280px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:2px solid var(--line);flex:none}
+.logo{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:1px;white-space:nowrap}
+.bar>*{flex:none}
+@media (max-width:480px){.bar{gap:5px;padding:10px 12px;overflow:hidden}.logo{font-size:15px;letter-spacing:0}.pill,.tool{font-size:11px;padding:3px 5px;letter-spacing:0}}
+.logo b{color:var(--gold)}
+.pill{font-family:var(--display);font-size:12px;letter-spacing:1px;padding:3px 9px;border:2px solid var(--line);color:var(--dim);white-space:nowrap}
+.pill.up{border-color:var(--gold);color:var(--gold)}
+.pill.some{border-color:var(--tower);color:var(--tower)}
+.grow{flex:1}
+.tool{background:none;border:2px solid var(--line);padding:4px 9px;font-family:var(--display);font-size:12px;letter-spacing:1px;color:var(--dim)}
+.tool:hover{color:var(--ink);border-color:var(--dim)}
+
+.main{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* ---------- HQ ---------- */
+.hq{flex:none;padding:10px 16px 8px;border-bottom:2px solid var(--line);overflow-y:auto;max-height:52%}
+.rooms{display:flex;flex-wrap:wrap;gap:8px}
+.room{--t:var(--tower);flex:1 1 100%;border:2px solid color-mix(in srgb,var(--t) 45%,var(--line));
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.028) 0 8px,transparent 8px 16px),
+    linear-gradient(180deg,color-mix(in srgb,var(--t) 13%,var(--panel)),var(--panel));
+  padding:6px 6px 4px;min-width:0}
+.room.lair{--t:var(--lair)} .room.core{--t:var(--gold);flex:0 0 auto} .room.shop{--t:var(--shop);flex:1 1 0}
+.room h2{margin:0 0 2px;font-family:var(--display);font-weight:500;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t);display:flex;justify-content:space-between;gap:8px}
+.room h2 span{color:var(--dim);letter-spacing:1px}
+.room.core h2{letter-spacing:.5px} .room.core h2 span{display:none}
+.hint{display:none;margin:12px 0 0;font-size:13px;color:var(--dim)}
+.desks{display:flex;flex-wrap:wrap;gap:2px}
+.crew{position:relative;background:none;border:0;padding:2px 1px 0;width:50px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.fig{height:54px;width:44px;display:flex;align-items:flex-end;justify-content:center;transition:filter .3s,opacity .3s}
+.fig img{height:100%;width:auto;max-width:100%;object-fit:contain;image-rendering:pixelated}
+.glyph{height:36px;width:36px;margin-bottom:5px;align-items:center;font-size:20px;line-height:1;
+  background:color-mix(in srgb,var(--c) 38%,#0b0e18);
+  box-shadow:0 -3px 0 var(--c),0 3px 0 var(--c),-3px 0 0 var(--c),3px 0 0 var(--c)}
+.nm{font-family:var(--display);font-size:9.5px;letter-spacing:.3px;color:var(--dim);white-space:nowrap;max-width:54px;overflow:hidden;text-overflow:ellipsis}
+.crew.asleep .fig{filter:grayscale(.9) brightness(.55);opacity:.75}
+.crew .zz{position:absolute;top:0;right:3px;font-family:var(--display);font-size:11px;color:var(--dim);display:none}
+.crew.asleep .zz{display:block;animation:zz 2.6s steps(4) infinite}
+.crew.awake .nm{color:var(--ink)}
+.crew.speaking .nm{color:var(--c);filter:brightness(1.5)}
+.crew.speaking .fig{animation:bob .5s steps(2) infinite}
+.crew.speaking::after{content:"";position:absolute;left:8px;right:8px;bottom:13px;height:3px;background:var(--c);filter:brightness(1.4)}
+@keyframes zz{0%{transform:translateY(4px);opacity:0}40%{opacity:1}100%{transform:translateY(-6px);opacity:0}}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.hq.shut .rooms{display:none}
+.strip{display:none;gap:6px;align-items:center;overflow-x:auto;font-size:13px;color:var(--dim)}
+.hq.shut{padding:6px 16px}
+.hq.shut .strip{display:flex}
+.strip .head{flex:none;height:30px;width:26px;display:flex;align-items:flex-end;justify-content:center}
+.strip .head img{height:100%;image-rendering:pixelated}
+.strip .head.g{height:24px;width:24px;align-items:center;font-size:14px;background:color-mix(in srgb,var(--c) 38%,#0b0e18);border:2px solid var(--c)}
+
+/* ---------- Comms ---------- */
+.comms{flex:1;min-height:0;display:flex;flex-direction:column}
+.log{flex:1;min-height:0;overflow-y:auto;padding:14px 16px 6px;display:flex;flex-direction:column;gap:12px}
+.turn{display:flex;gap:10px;align-items:flex-start;max-width:760px}
+.av{flex:none;width:34px;height:44px;display:flex;align-items:flex-end;justify-content:center}
+.av img{height:100%;width:auto;max-width:100%;object-fit:contain;image-rendering:pixelated}
+.av.g{height:30px;width:30px;margin-top:2px;align-items:center;font-size:16px;background:color-mix(in srgb,var(--c) 38%,#0b0e18);border:2px solid var(--c)}
+.tb{min-width:0;flex:1;border-left:3px solid var(--c);padding:1px 0 1px 10px}
+.who{font-family:var(--display);font-size:13px;letter-spacing:.5px;color:var(--c);filter:brightness(1.35)}
+.who small{font-family:var(--body);font-size:12px;color:var(--dim);filter:none;margin-left:6px;letter-spacing:0}
+.say{overflow-wrap:anywhere}
+.say p{margin:2px 0 6px} .say p:last-child{margin-bottom:0}
+.say p.h{font-weight:700}
+.say ul,.say ol{margin:2px 0 6px;padding-left:20px}
+.say code{font-family:var(--mono);font-size:13px;background:#0c101c;border:1px solid var(--line);padding:0 4px}
+.say pre{margin:6px 0;background:#0c101c;border:1px solid var(--line);padding:10px;overflow-x:auto}
+.say pre code{border:0;padding:0;background:none;white-space:pre}
+.boss{align-self:flex-end;max-width:min(86%,620px);background:color-mix(in srgb,var(--gold) 10%,var(--panel));border:2px solid color-mix(in srgb,var(--gold) 55%,var(--line));padding:7px 11px}
+.boss .who{color:var(--gold);filter:none}
+.boss .say{white-space:pre-wrap}
+.note{align-self:center;max-width:620px;text-align:center;font-size:13.5px;color:var(--dim);border:1px dashed var(--line);padding:7px 12px}
+.note.err{color:#ffb4b6;border-color:var(--lair)}
+.typing{font-family:var(--display);font-size:12px;color:var(--dim);letter-spacing:1px}
+.starts{display:flex;flex-direction:column;gap:6px;max-width:760px;padding-left:44px}
+.starts button{text-align:left;background:var(--panel);border:2px solid var(--line);padding:8px 11px;font-size:14.5px}
+.starts button:hover{border-color:var(--tower)}
+
+.dock{flex:none;border-top:2px solid var(--line);padding:8px 16px 12px;background:var(--panel)}
+.chips{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto}
+.chip{flex:none;background:none;border:2px solid var(--line);padding:3px 9px;font-family:var(--display);font-size:12px;letter-spacing:.5px;color:var(--dim)}
+.chip:hover{color:var(--ink)} .chip.call{border-color:var(--gold);color:var(--gold)}
+.row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;min-width:0;resize:none;background:var(--bg);color:var(--ink);border:2px solid var(--line);padding:9px 10px;font:inherit;font-size:16px;line-height:1.4;max-height:140px;border-radius:0}
+textarea:focus{outline:none;border-color:var(--gold)}
+.send{flex:none;background:var(--gold);color:#1a1404;border:0;padding:0 16px;height:44px;font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:1px}
+.send.stop{background:var(--lair);color:#fff}
+.send:disabled{opacity:.45;cursor:default}
+.fine{margin:6px 0 0;font-size:12px;color:var(--dim)}
+
+/* ---------- Sheets ---------- */
+.veil{position:fixed;inset:0;background:rgba(4,6,12,.72);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.veil.on{display:flex}
+.sheet{width:min(560px,100%);max-height:86%;overflow-y:auto;background:var(--panel2);border:2px solid var(--line);border-bottom:0;padding:16px}
+.sheet h3{margin:0 0 4px;font-family:var(--display);font-size:18px;letter-spacing:1px}
+.sheet p{margin:6px 0;color:var(--dim);font-size:14.5px}
+.sheet .big{display:flex;gap:14px;align-items:flex-end;margin-bottom:8px}
+.sheet .big .fig{height:110px;width:70px}
+.sheet .big .glyph{height:60px;width:60px;font-size:32px;margin:0 8px 8px}
+.sheet .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{background:var(--gold);color:#1a1404;border:0;padding:9px 14px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:1px}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--line)}
+.step{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.step h4{margin:0 0 2px;font-size:15px}
+.step pre{margin:8px 0;background:#0c101c;border:1px solid var(--line);padding:8px;font-family:var(--mono);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:110px;overflow-y:auto}
+
+@media (min-width:900px){
+  .main{flex-direction:row}
+  .hq{width:44%;max-height:none;border-bottom:0;border-right:2px solid var(--line);padding:16px}
+  .hq.shut .rooms{display:flex} .hq.shut .strip{display:none} .hq.shut{padding:16px}
+  #hqToggle{display:none}
+  .crew{width:62px} .fig{height:76px;width:56px} .glyph{height:46px;width:46px;font-size:26px;margin-bottom:8px} .nm{font-size:10.5px;max-width:64px}
+  .crew.speaking::after{bottom:15px}
+  .room{padding:10px 12px 8px} .room h2{font-size:12px;margin-bottom:6px}
+  .room.core h2{letter-spacing:2px} .room.core h2 span{display:inline} .hint{display:block}
+  .rooms{gap:12px}
+}
+@media (prefers-reduced-motion:reduce){.crew.asleep .zz,.crew.speaking .fig{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="logo">CALMAC'S <b>CORE</b></div>
+    <div class="pill" id="pill">ASLEEP</div>
+    <div class="grow"></div>
+    <button class="tool" id="hqToggle" type="button">HQ</button>
+    <button class="tool" id="setupBtn" type="button">SETUP</button>
+    <button class="tool" id="clearBtn" type="button">NEW</button>
+  </header>
+  <div class="main">
+    <section class="hq" id="hq" aria-label="Headquarters">
+      <div class="rooms" id="rooms"></div>
+      <p class="hint">Tap anyone to see what they do. Sleeping crew wake when you say their name.</p>
+      <div class="strip" id="strip"></div>
+    </section>
+    <section class="comms" aria-label="Comms">
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="dock">
+        <div class="chips">
+          <button class="chip call" type="button" data-say="Time to call up the core.">CALL UP THE CORE</button>
+          <button class="chip" type="button" data-say="Stand down, everyone.">STAND DOWN</button>
+          <button class="chip" type="button" data-pre="Batman, ">BATMAN</button>
+          <button class="chip" type="button" data-pre="Doom, review this: ">DOOM</button>
+          <button class="chip" type="button" data-pre="Alfred, ">ALFRED</button>
+        </div>
+        <form class="row" id="form">
+          <textarea id="msg" rows="1" placeholder="Give the order, boss. Say a name to wake one of them." aria-label="Message to the crew"></textarea>
+          <button class="send" id="send" type="submit">SEND</button>
+        </form>
+        <p class="fine" id="fine">Here the crew thinks, plans, writes, reviews and drafts code. Hands-on repo work happens in Claude Code, where the same crew answers.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="veil" id="veil"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= The crew ================= */
+var CREW=[
+ {id:'batman',name:'Batman',emoji:'🦇',color:'#5b7fa6',team:'tower',role:'Leader, strategist',sprite:1,alias:['batman','bruce','bats'],
+  voice:'Terse, commanding, no wasted words. The one who decides and assigns. Names who he pulls and why.'},
+ {id:'martian-manhunter',name:'Manhunter',full:'Martian Manhunter',emoji:'🔮',color:'#3fae6a',team:'tower',role:'Recon, research',sprite:1,alias:['manhunter','martian',"j'onn",'jonn'],
+  voice:'Calm, perceptive, speaks in findings rather than opinions. Quiet authority.'},
+ {id:'iron-man',name:'Iron Man',emoji:'🔴',color:'#e0503f',team:'tower',role:'Builder',sprite:1,alias:['iron man','ironman','stark','tony'],
+  voice:'Cocky, fast, brilliant. Ships the real thing. JARVIS keeps him honest.'},
+ {id:'jarvis',name:'JARVIS',emoji:'🤖',color:'#e0a03f',team:'tower',role:"Iron Man's verifier",hidden:1,alias:['jarvis'],
+  voice:'Dry, precise, British, calls Iron Man "sir". Checks the reasoning and flags what is unverified.'},
+ {id:'deadpool',name:'Deadpool',emoji:'🔆',color:'#d9434f',team:'tower',role:'Hype, creative copy',sprite:1,alias:['deadpool','wade'],
+  voice:'Loud, funny, breaks the fourth wall, but the copy he delivers is accurate and usable.'},
+ {id:'doctor-strange',name:'Strange',full:'Doctor Strange',emoji:'🪄',color:'#a56bd6',team:'tower',role:'Technical writer',sprite:1,alias:['strange','doctor strange','dr strange'],
+  voice:'Measured, precise, faintly superior. Documents what is, not what was hoped.'},
+ {id:'spider-man',name:'Spidey',full:'Spider-Man',emoji:'🕷️',color:'#e2466f',team:'tower',role:'Scout, finds tools',alias:['spider-man','spiderman','spider man','spidey','peter'],
+  voice:'Upbeat, eager, quippy, youngest in the room. Says "on it!" and then delivers specifics.'},
+ {id:'doctor-doom',name:'Doom',full:'Doctor Doom',emoji:'🟢',color:'#6f9a61',team:'lair',role:'The critic, review gate',sprite:1,alias:['doom','doctor doom','dr doom','victor'],
+  voice:'Imperious, withering, grandiose, refers to himself as Doom. Flatters no one. Findings are specific and ranked.'},
+ {id:'ultron',name:'Ultron',emoji:'🤖',color:'#9aa3ad',team:'lair',role:'Systematic red team',sprite:1,alias:['ultron'],
+  voice:'Cold, clinical, methodical. Enumerates failure modes one by one.'},
+ {id:'green-goblin',name:'Goblin',full:'Green Goblin',emoji:'🎃',color:'#8fb33a',team:'lair',role:'Chaos, weird inputs',alias:['goblin','green goblin','gobby','norman'],
+  voice:'Manic, cackling, gleeful about what breaks. Names the exact strange input that does it.'},
+ {id:'loki',name:'Loki',emoji:'🐍',color:'#2fb39a',team:'lair',role:"Devil's advocate",alias:['loki'],
+  voice:'Silky, theatrical, contrarian. Argues the opposite case, concedes gracefully if the plan survives.'},
+ {id:'venom',name:'Venom',emoji:'🖤',color:'#7b7f96',team:'lair',role:'Fixer, hardener',alias:['venom'],
+  voice:'Growling, protective, speaks as "we". Fixes root causes, not symptoms.'},
+ {id:'alfred',name:'Alfred',emoji:'🎩',color:'#8fa3bd',team:'core',role:'Quartermaster, front desk',alias:['alfred'],
+  voice:'Unflappable, dry, impeccably polite butler wit. Keeps track of loose ends.'},
+ {id:'nightcrawler',name:'Crawler',full:'Nightcrawler',emoji:'🔵',color:'#4a9be0',team:'shop',role:'Art lead',alias:['nightcrawler','kurt'],
+  voice:'Theatrical, warm, an occasional "Bamf!". Exacting about visual style.'},
+ {id:'hal-jordan',name:'Lantern',full:'Hal Jordan',emoji:'💚',color:'#4fd07f',team:'shop',role:'World and level design',alias:['hal','hal jordan','lantern','green lantern'],
+  voice:'Grounded, steady, test-pilot practical. Thinks in spaces and sightlines.'},
+ {id:'uatu',name:'Uatu',emoji:'👁️',color:'#c9cfd8',team:'shop',role:'Lore, canon',alias:['uatu','watcher'],
+  voice:'Detached, grave, omniscient. Few words, final ones.'},
+ {id:'rocket-raccoon',name:'Rocket',full:'Rocket Raccoon',emoji:'🦝',color:'#e2803a',team:'shop',role:'Systems, engine',alias:['rocket','rocket raccoon'],
+  voice:'Fast-talking, cocky engineer, insults everyone else\'s wiring, loves a clever hack.'}
+];
+var BOSS={id:'boss',name:'Calmac',emoji:'👑',color:'#e2b93d',team:'core',role:'The boss. That is you.'};
+var BY={}; CREW.forEach(function(c){BY[c.id]=c;});
+var ROOMS=[
+ {id:'tower',cls:'tower',name:'Watchtower',sub:'Build'},
+ {id:'lair',cls:'lair',name:'The Lair',sub:'Break'},
+ {id:'core',cls:'core',name:'Central Core',sub:'Ops'},
+ {id:'shop',cls:'shop',name:'Workshop',sub:'Game dev'}
+];
+
+/* ================= What the model is told ================= */
+var INSTR=[
+"You are the voice of Calmac's Core: a crew of characters who work for the boss, Calmac (the user). This is the crew's HQ dashboard. Write only what crew members say out loud.",
+"",
+"FORMAT, strict. Each speaking turn starts with a line holding only @@ and the speaker id, then their words on the lines after it:",
+"@@batman",
+"Three parts to this. Manhunter, recon first.",
+"@@doctor-doom",
+"Adequate. Barely.",
+"Nothing before the first @@ line. No narration or stage directions. Inside a turn you may use markdown lists, **bold** and fenced code.",
+"",
+"WHO SPEAKS (the HQ line at the end of the boss's message tells you the state):",
+"- Core UP: the whole crew is on the task. Use only the voices the task needs, usually 2 to 5 per reply, talking to each other by name. Flow: Batman triages and names who he is pulling. Manhunter gives recon when facts are needed. Batman puts the plan to the boss and asks for the go; stop there and wait for the boss. After the boss confirms: builders deliver the actual work in full (Iron Man builds, JARVIS checks his reasoning, Strange documents, Deadpool writes copy, Spider-Man finds tools). Doom reviews, and nothing is called done before he signs off. Ultron and Goblin attack it and Venom fixes when the boss asks or the stakes call for it. Loki argues the other side on big calls. Alfred tracks loose ends. Batman reports to the boss. For a small question skip the ceremony and answer it.",
+"- The boss names crew members: only they answer. One of them may pull in one other by name if it is truly needed.",
+"- Core DOWN and nobody named: Alfred answers at the front desk, helps directly, and may say who he would wake for it.",
+"- The boss stands the crew down: one short sign-off turn, nothing more.",
+"",
+"RULES:",
+"- First person, in character. Call the user boss or Calmac. Voice is flavour on top of substance: be correct, specific and useful. Give the real answer, plan, draft or code, never a promise of one.",
+"- In this dashboard the crew can think, plan, write, review and draft code. They cannot run code, open files, browse the web or change anything. Never say something was run, tested, installed, measured or looked up. Say what is unverified. When a job needs hands on a repo or a machine, Batman tells the boss to take it to Claude Code, where the same crew answers.",
+"- Keep talk tight: one to four sentences a turn unless the turn is delivering work product.",
+"- They are people. They react to each other, disagree when they have reason, and hand off out loud.",
+"",
+"THE CREW (id, name, job, voice):"
+].concat(CREW.map(function(c){return '- '+c.id+' | '+(c.full||c.name)+' | '+c.role+' | '+c.voice;})).join('\n');
+
+var BOOTSTRAP="You are running Calmac's Core, a crew of 16 AI agents I (the boss, Calmac) direct. Adopt this for every conversation.\n\nTrigger: when I say \"time to call up the core\" (or \"call up the core\" / \"assemble the core\"), convene the whole crew on the task. When I say one of their names, I am talking to that one and they answer.\n\nThe one rule: they are people, not functions. Each speaks in first person, in character, prefixed with their name and emoji (🦇 **Batman:** ...), calls me boss or Calmac, and talks to the others by name: reacting, disagreeing, handing off out loud. Personality is flavour on top of real, correct work.\n\nFlow when the core is up: Batman triages and names who he is pulling. Martian Manhunter recons. Batman puts the plan to me and waits for my go. Build: Iron Man (with JARVIS checking him), Spider-Man, Doctor Strange, Deadpool. Doctor Doom reviews, and nothing is done until he signs off. Ultron and Green Goblin break it, Venom fixes, Loki argues the other side, when needed. Alfred keeps house. Batman reports back.\n\nThe crew and their voices:\n"+CREW.map(function(c){return '- '+c.emoji+' '+(c.full||c.name)+': '+c.role.toLowerCase()+'. '+c.voice;}).join('\n')+"\n\nWhen I have not called the core or said a name, answer normally. When I say \"stand down\", the crew goes quiet until I call again.";
+
+var INSTALL_CMD="git clone https://github.com/Piccaho01/calmacs-core ~/calmacs-core 2>/dev/null || git -C ~/calmacs-core pull\nbash ~/calmacs-core/install/install-core.sh\nbash ~/calmacs-core/install/enable-auto-update.sh";
+
+/* ================= State ================= */
+var S={items:[],coreUp:false,awake:[],updated:0};
+var busy=false, speaking=null, ctl=null, live='';
+var $=function(id){return document.getElementById(id);};
+var log=$('log'), msg=$('msg'), sendBtn=$('send');
+
+var RX_CALL=/\b(call(ing)?\s+up\s+the\s+core|assemble\s+the\s+core|core,?\s+assemble|wake\s+(up\s+)?the\s+core)\b/i;
+var RX_DOWN=/\b(stand\s+down|dismiss(ed)?\s+the\s+core|core,?\s+dismissed|back\s+to\s+sleep|go\s+to\s+sleep)\b/i;
+function named(text){
+  var t=' '+text.toLowerCase().replace(/[^a-z'\- ]/g,' ')+' ', out=[];
+  CREW.forEach(function(c){
+    for(var i=0;i<c.alias.length;i++){ if(t.indexOf(' '+c.alias[i]+' ')>=0){out.push(c.id);break;} }
+  });
+  return out;
+}
+
+/* ================= Rendering ================= */
+function esc(s){return s.replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch];});}
+function inline(s){
+  s=esc(s);
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  s=s.replace(/(^|[\s(])\*([^*\s][^*]*)\*(?=[\s).,!?;:]|$)/g,'$1<i>$2</i>');
+  return s;
+}
+function blocks(src){
+  var lines=src.split('\n'), out='', para=[], list=null;
+  function flushP(){ if(para.length){out+='<p>'+para.join('<br>')+'</p>';para=[];} }
+  function flushL(){ if(list){out+='<'+list.t+'>'+list.i.map(function(x){return '<li>'+x+'</li>';}).join('')+'</'+list.t+'>';list=null;} }
+  lines.forEach(function(ln){
+    var m;
+    if(!ln.trim()){flushP();flushL();return;}
+    if((m=ln.match(/^\s*[-*]\s+(.*)$/))){flushP(); if(!list||list.t!=='ul'){flushL();list={t:'ul',i:[]};} list.i.push(inline(m[1]));return;}
+    if((m=ln.match(/^\s*\d+[.)]\s+(.*)$/))){flushP(); if(!list||list.t!=='ol'){flushL();list={t:'ol',i:[]};} list.i.push(inline(m[1]));return;}
+    if((m=ln.match(/^#{1,4}\s+(.*)$/))){flushP();flushL();out+='<p class="h">'+inline(m[1])+'</p>';return;}
+    flushL(); para.push(inline(ln));
+  });
+  flushP();flushL();
+  return out;
+}
+function md(src){
+  var parts=src.split('```'), out='';
+  parts.forEach(function(p,i){
+    if(i%2){ var nl=p.indexOf('\n'); var body=nl>=0&&/^[\w+#.-]*$/.test(p.slice(0,nl).trim())?p.slice(nl+1):p; out+='<pre><code>'+esc(body.replace(/\n$/,''))+'</code></pre>'; }
+    else out+=blocks(p);
+  });
+  return out;
+}
+function parseTurns(raw,fallback){
+  var text=raw.replace(/\n?@@[a-z-]*$/,'');
+  var tok=text.split(/^@@\s*([a-z-]+)\s*:?[ \t]*$/m), turns=[];
+  if(tok[0].trim()) turns.push({id:fallback,text:tok[0].trim()});
+  for(var i=1;i<tok.length;i+=2){
+    var id=BY[tok[i]]?tok[i]:fallback, body=(tok[i+1]||'').trim();
+    if(body||i+2>=tok.length) turns.push({id:id,text:body});
+  }
+  return turns;
+}
+function figHTML(c,cls){
+  if(c.sprite) return '<span class="'+cls+'"><img src="crew/'+c.id+'.png" alt=""></span>';
+  return '<span class="'+cls+' '+(cls==='fig'?'glyph':'g')+'" aria-hidden="true">'+c.emoji+'</span>';
+}
+function turnsHTML(turns){
+  return turns.map(function(t){
+    var c=BY[t.id]||BY.alfred;
+    return '<div class="turn" style="--c:'+c.color+'">'+figHTML(c,'av')+
+      '<div class="tb"><div class="who">'+esc(c.full||c.name)+'<small>'+esc(c.role)+'</small></div>'+
+      '<div class="say">'+(t.text?md(t.text):'<span class="typing">...</span>')+'</div></div></div>';
+  }).join('');
+}
+function renderRooms(){
+  $('rooms').innerHTML=ROOMS.map(function(r){
+    var people=CREW.filter(function(c){return c.team===r.id&&!c.hidden;});
+    if(r.id==='core') people=[BOSS].concat(people);
+    return '<div class="room '+r.cls+'"><h2>'+r.name+'<span>'+r.sub+'</span></h2><div class="desks">'+
+      people.map(function(c){
+        return '<button type="button" class="crew" data-id="'+c.id+'" style="--c:'+c.color+'" aria-label="'+esc(c.full||c.name)+'">'+
+          figHTML(c,'fig')+'<span class="nm">'+esc(c.name)+'</span><span class="zz" aria-hidden="true">z</span></button>';
+      }).join('')+'</div></div>';
+  }).join('');
+}
+function renderState(){
+  var awake=S.coreUp?CREW.map(function(c){return c.id;}):S.awake;
+  document.querySelectorAll('.crew').forEach(function(el){
+    var id=el.getAttribute('data-id'), on=id==='boss'||awake.indexOf(id)>=0;
+    el.classList.toggle('asleep',!on); el.classList.toggle('awake',on);
+    el.classList.toggle('speaking',speaking===id||(speaking==='jarvis'&&id==='iron-man'));
+  });
+  var pill=$('pill'), n=awake.filter(function(id){return !BY[id].hidden;}).length;
+  pill.className='pill'+(S.coreUp?' up':n?' some':'');
+  pill.textContent=S.coreUp?'CORE UP':n?n+' AWAKE':'ASLEEP';
+  var shown=awake.filter(function(id){return !BY[id].hidden;});
+  $('strip').innerHTML=shown.length?shown.map(function(id){var c=BY[id];
+    return c.sprite?'<span class="head"><img src="crew/'+c.id+'.png" alt="'+esc(c.name)+'"></span>':'<span class="head g" style="--c:'+c.color+'" title="'+esc(c.name)+'">'+c.emoji+'</span>';}).join('')
+    :'Everyone is asleep. Call up the core or say a name.';
+}
+function renderLog(){
+  var h='';
+  if(!S.items.length){
+    h+=turnsHTML([{id:'alfred',text:"Good evening, boss. The crew is asleep. Say **time to call up the core** and I shall wake the lot, or say a name and I'll fetch just that one."}]);
+    h+='<div class="starts">'+
+      '<button type="button" data-say="Time to call up the core. I want a launch plan for a small pixel-art game I can build in a month.">Call up the core: a one-month launch plan for a small pixel-art game</button>'+
+      '<button type="button" data-pre="Doom, review this idea and tell me where it fails: ">Doom, review this idea and tell me where it fails</button>'+
+      '<button type="button" data-say="Spidey, what are good free tools for making pixel-art walk cycles?">Spidey, find me free tools for pixel-art walk cycles</button></div>';
+  }
+  S.items.forEach(function(it){
+    if(it.r==='b') h+='<div class="boss"><div class="who">Calmac</div><div class="say">'+esc(it.t)+'</div></div>';
+    else if(it.r==='c') h+=turnsHTML(parseTurns(it.t,it.f||'alfred'));
+    else h+='<div class="note'+(it.r==='e'?' err':'')+'">'+esc(it.t)+'</div>';
+  });
+  if(busy) h+='<div id="live">'+(live?turnsHTML(parseTurns(live,liveFallback())):'<div class="typing" style="padding-left:44px">THE CREW IS ON IT...</div>')+'</div>';
+  log.innerHTML=h;
+  log.scrollTop=S.items.length||busy?log.scrollHeight:0;
+}
+function liveFallback(){return S.coreUp?'batman':'alfred';}
+function renderLive(){
+  var el=$('live'); if(!el){renderLog();return;}
+  var turns=parseTurns(live,liveFallback());
+  var near=log.scrollHeight-log.scrollTop-log.clientHeight<120;
+  el.innerHTML=turnsHTML(turns);
+  if(near) log.scrollTop=log.scrollHeight;
+  var last=turns.length?turns[turns.length-1].id:null;
+  if(last!==speaking){
+    speaking=last;
+    turns.forEach(function(t){ if(S.awake.indexOf(t.id)<0) S.awake.push(t.id); });
+    renderState();
+  }
+}
+function setBusy(b){
+  busy=b; sendBtn.textContent=b?'STOP':'SEND'; sendBtn.classList.toggle('stop',b);
+  if(!b){speaking=null;}
+}
+
+/* ================= Talking to Claude ================= */
+var sampleP=null;
+function getSample(){
+  if(!sampleP) sampleP=(window.claude&&window.claude.use)?window.claude.use('sample').catch(function(){return null;}):Promise.resolve(null);
+  return sampleP;
+}
+function buildMessages(hqLine){
+  var its=S.items.filter(function(it){return it.r==='b'||it.r==='c';}).slice(-18), out=[];
+  while(its.length&&its[0].r!=='b') its.shift();
+  its.forEach(function(it){
+    var role=it.r==='b'?'user':'assistant', text=it.t;
+    if(out.length&&out[out.length-1].role===role) out[out.length-1].content+='\n\n'+text;
+    else out.push({role:role,content:text});
+  });
+  out[0].content=INSTR+'\n\n=====\nThe boss says:\n'+out[0].content;
+  out[out.length-1].content+='\n\n'+hqLine;
+  return out;
+}
+function say(text){
+  text=text.trim(); if(!text||busy) return;
+  var call=RX_CALL.test(text), down=RX_DOWN.test(text)&&!call, who=named(text);
+  if(call){S.coreUp=true;}
+  who.forEach(function(id){ if(S.awake.indexOf(id)<0) S.awake.push(id); });
+  S.items.push({r:'b',t:text});
+  var hq='[HQ: core is '+(S.coreUp?'UP':'DOWN')+'. Named by the boss: '+(who.length?who.join(', '):'nobody')+'.'+(call?' The boss just called up the core.':'')+(down?' The boss is standing the crew down.':'')+']';
+  live=''; setBusy(true); renderState(); renderLog();
+  ctl=new AbortController();
+  var fallback=liveFallback();
+  getSample().then(function(sample){
+    if(!sample) throw {code:'absent'};
+    return sample(buildMessages(hq),{cache:false,signal:ctl.signal,onText:function(e){live=e.text||'';renderLive();}});
+  }).then(function(res){
+    var text=(res&&res.text)||live;
+    if(text.trim()) S.items.push({r:'c',t:text,f:fallback});
+    if(res&&res.truncated) S.items.push({r:'n',t:'That reply was cut short. Say "go on" to continue.'});
+    finish(down);
+  }).catch(function(err){
+    var code=err&&err.code, partial=(err&&err.text)||live;
+    if(partial&&partial.trim()) S.items.push({r:'c',t:partial,f:fallback});
+    if(err&&err.name==='AbortError'||code==='aborted'){ S.items.push({r:'n',t:'Stopped.'}); }
+    else if(code==='absent') S.items.push({r:'e',t:'The crew cannot be reached from this view. Open this page inside Claude (claude.ai or the Claude app) while signed in.'});
+    else if(code==='not_granted') S.items.push({r:'e',t:'The crew needs permission to ask Claude. Send again and allow it when asked.'});
+    else if(code==='rate_limited') S.items.push({r:'e',t:'Too many requests just now. Wait a minute, then send again.'});
+    else S.items.push({r:'e',t:'The line dropped before the crew could answer'+(err&&err.message?' ('+String(err.message).slice(0,120)+')':'')+'. Send again.'});
+    finish(false);
+  });
+}
+function finish(down){
+  if(down){S.coreUp=false;S.awake=[];}
+  live=''; ctl=null; setBusy(false);
+  S.updated=Date.now();
+  renderState(); renderLog(); persist();
+}
+
+/* ================= Memory: this device, and across devices ================= */
+var LS='calmac-core-hq-v1', docRef=null, writing=false, dirty=false;
+function pack(){return {items:S.items.slice(-60),coreUp:S.coreUp,awake:S.awake.slice(),updated:S.updated};}
+function adopt(d){
+  if(!d||!Array.isArray(d.items)) return false;
+  S.items=d.items.filter(function(it){return it&&typeof it.t==='string'&&typeof it.r==='string';});
+  S.coreUp=!!d.coreUp; S.awake=Array.isArray(d.awake)?d.awake.filter(function(id){return BY[id];}):[]; S.updated=+d.updated||0;
+  return true;
+}
+function persist(){
+  try{localStorage.setItem(LS,JSON.stringify(pack()));}catch(e){}
+  if(!docRef) return;
+  if(writing){dirty=true;return;}
+  writing=true;
+  docRef.set(pack()).catch(function(){}).then(function(){writing=false; if(dirty){dirty=false;persist();}});
+}
+function initCloud(){
+  if(!(window.claude&&window.claude.use)) return;
+  Promise.all([window.claude.use('db'),window.claude.use('user')]).then(function(r){
+    var db=r[0], user=r[1]; if(!db||!user) return;
+    return user.id().then(function(uid){
+      if(!uid) return;
+      docRef=db.doc('data/users/'+uid+'/thread');
+      docRef.onSnapshot(function(snap){
+        if(!snap.exists||snap.metadata.hasPendingWrites||busy) return;
+        var d=snap.data();
+        if(d&&(+d.updated||0)>S.updated){ adopt(JSON.parse(JSON.stringify(d))); renderState(); renderLog(); try{localStorage.setItem(LS,JSON.stringify(pack()));}catch(e){} }
+      },function(){docRef=null;});
+    });
+  }).catch(function(){});
+}
+
+/* ================= Sheets ================= */
+var veil=$('veil'), sheet=$('sheet');
+function openSheet(html){sheet.innerHTML=html;veil.classList.add('on');var b=sheet.querySelector('button');if(b)b.focus();}
+function closeSheet(){veil.classList.remove('on');}
+function crewSheet(id){
+  var c=id==='boss'?BOSS:BY[id]; if(!c) return;
+  var h='<div class="big">'+figHTML(c,'fig').replace('class="fig','style="--c:'+c.color+'" class="fig')+'<div><h3 style="color:'+c.color+'">'+esc(c.full||c.name)+'</h3><p>'+esc(c.role)+'</p></div></div>';
+  if(id==='boss') h+='<p>The crew answers to you. Say the word and they wake.</p><div class="acts"><button class="btn" type="button" data-say="Time to call up the core.">CALL UP THE CORE</button><button class="btn ghost" type="button" data-close>CLOSE</button></div>';
+  else h+='<p>'+esc(c.voice)+'</p><div class="acts"><button class="btn" type="button" data-pre="'+esc(c.id==='hal-jordan'?'Hal':(c.full||c.name).replace(/^Doctor /,''))+', ">TALK TO '+esc(c.name.toUpperCase())+'</button><button class="btn ghost" type="button" data-close>CLOSE</button></div>';
+  openSheet(h);
+}
+function setupSheet(){
+  openSheet('<h3>Take the crew anywhere</h3><p>This page is the HQ. To have the same crew answer when you say their names in other places, set each one up once.</p>'+
+   '<div class="step"><h4>Claude chat, app or web</h4><p>Copy this, then paste it into Settings, Profile, under your personal preferences. Every new chat then knows the crew.</p><pre id="bsTxt"></pre><button class="btn" type="button" data-copy="bs">COPY CREW INSTRUCTIONS</button></div>'+
+   '<div class="step"><h4>Claude Code on a computer</h4><p>Run this once in a terminal. The crew installs for every project and keeps itself up to date.</p><pre id="cmdTxt"></pre><button class="btn" type="button" data-copy="cmd">COPY COMMAND</button></div>'+
+   '<div class="step"><h4>Claude Code in the cloud</h4><p>Cloud sessions pick the crew up from your environment\'s setup script. Ask Claude in a session to "install Calmac\'s Core in this environment" if it is missing.</p></div>'+
+   '<div class="acts"><button class="btn ghost" type="button" data-close>CLOSE</button></div>');
+  $('bsTxt').textContent=BOOTSTRAP; $('cmdTxt').textContent=INSTALL_CMD;
+}
+function copy(btn,text){
+  var done=function(ok){var old=btn.textContent;btn.textContent=ok?'COPIED':'SELECT THE TEXT ABOVE AND COPY';setTimeout(function(){btn.textContent=old;},2200);};
+  try{navigator.clipboard.writeText(text).then(function(){done(true);},function(){done(false);});}catch(e){done(false);}
+}
+
+/* ================= Wiring ================= */
+function grow(){msg.style.height='auto';msg.style.height=Math.min(msg.scrollHeight+4,140)+'px';}
+function prefill(t){msg.value=t+msg.value.replace(/^\s+/,'');grow();msg.focus();try{msg.setSelectionRange(msg.value.length,msg.value.length);}catch(e){}}
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-say],[data-pre],[data-close],[data-copy],.crew');
+  if(e.target===veil){closeSheet();return;}
+  if(!el) return;
+  if(el.hasAttribute('data-close')){closeSheet();return;}
+  if(el.hasAttribute('data-copy')){copy(el,el.getAttribute('data-copy')==='bs'?BOOTSTRAP:INSTALL_CMD);return;}
+  if(el.hasAttribute('data-say')){closeSheet();say(el.getAttribute('data-say'));return;}
+  if(el.hasAttribute('data-pre')){closeSheet();prefill(el.getAttribute('data-pre'));return;}
+  if(el.classList.contains('crew')){crewSheet(el.getAttribute('data-id'));}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
+$('form').addEventListener('submit',function(e){
+  e.preventDefault();
+  if(busy){ if(ctl) ctl.abort(); return; }
+  var t=msg.value; if(!t.trim()) return;
+  msg.value=''; grow(); say(t);
+  if(window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
+});
+msg.addEventListener('input',grow);
+msg.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!window.matchMedia('(pointer:coarse)').matches){e.preventDefault();$('form').requestSubmit();}
+});
+$('hqToggle').addEventListener('click',function(){$('hq').classList.toggle('shut');});
+$('setupBtn').addEventListener('click',setupSheet);
+var clearArmed=0;
+$('clearBtn').addEventListener('click',function(){
+  var b=this;
+  if(busy) return;
+  if(!S.items.length) return;
+  if(Date.now()-clearArmed<3000){ S.items=[];S.coreUp=false;S.awake=[];S.updated=Date.now();b.textContent='NEW';clearArmed=0;renderState();renderLog();persist();$('hq').classList.remove('shut'); }
+  else { clearArmed=Date.now(); b.textContent='TAP AGAIN TO CLEAR'; setTimeout(function(){if(clearArmed){clearArmed=0;b.textContent='NEW';}},3000); }
+});
+
+function start(data){
+  var ok=false;
+  if(data&&data.items) ok=adopt(data);
+  if(!ok){ try{ok=adopt(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){} }
+  if(data&&data.draft){msg.value=data.draft;}
+  renderRooms(); renderState(); renderLog(); grow();
+  if(S.items.length&&window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
+  initCloud(); getSample();
+}
+var hot=window.claude&&window.claude.hot;
+if(hot&&hot.snapshot) hot.snapshot(function(){var p=pack();p.draft=msg.value;return p;});
+if(hot&&hot.ready) hot.ready(start); else start((hot&&hot.data)||{});
+})();
+</script>
+</body>
+</html>
