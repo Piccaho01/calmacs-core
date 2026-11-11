@@ -32,15 +32,17 @@ specific character.
 
 ## Roles
 
-- Working roles for all 16: `agents-draft/` (these are **drafts** pending reconcile
-  against the real `~/.claude/agents/` files once the home PC is back).
+- Working roles for all 16: `agents/` — **the canonical crew, finalized and usable
+  now** from any session or device (no PC required).
 - Teams: **Build** (Batman, Martian Manhunter, Iron Man, Deadpool, Dr Strange,
   Spider-Man) · **Break** (Dr Doom, Ultron, Green Goblin, Loki, Venom) · **Ops**
   (Alfred) · **Game-Dev** (Nightcrawler, Hal Jordan, Uatu, Rocket Raccoon).
 
 ## Status
 
+- **The core is final** — the crew (`agents/`), the Core Protocol (`core-protocol.md`)
+  and the "call up the core" trigger are the working system from now on.
 - Live reference page (plan + sprites) auto-deploys to GitHub Pages on push to `main`.
-- Sprites: 7 of 16 done (see `sprites/`).
-- The live office engine (hooks → WebSocket → Express → React) is built on the home
-  PC — currently out of commission.
+- Sprites: 7 of 16 done (see `sprites/`); remaining prompts in `sprite-prompts.md`.
+- The live office dashboard (hooks → WebSocket → Express → React) is **on hold** —
+  build kit ready in `dashboard/`, runs on a host when you choose to stand it up.

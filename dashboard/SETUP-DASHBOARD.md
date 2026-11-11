@@ -4,7 +4,7 @@ The live office is a reskin of **Claude-Office / Agent Office** (W17ANT, MIT) �
 Vite + React + Express/WebSocket app that binds to `127.0.0.1` and visualizes your
 Claude Code agents. It **must run on the home PC** (localhost-only by design); it
 can't run from the cloud. Everything below is prepared in this repo (`dashboard/`,
-`agents-draft/`, `sprite-prompts.md`) so this is mostly copy-paste.
+`agents/`, `sprite-prompts.md`) so this is mostly copy-paste.
 
 > **Verified vs. flagged:** the config, sprite naming, boss wiring and the
 > AGENT_CONFIGS / ROLE_TO_CHAR registries were read from the actual Claude-Office
@@ -59,10 +59,10 @@ Use the **exact sprite base names** from the roster (`batman-1`, `iron-man-1`,
 > a sprite fall back to a default character, so you can start partial and fill in.
 
 ## 5. Install the agents
-Copy the 16 definition files from this repo's `agents-draft/*.md` to the PC's
-`~/.claude/agents/` (strip the `-DRAFT` framing when you're happy with them, and
-**reconcile against any originals** if the PC still has them). The filename (e.g.
-`batman.md` → agent `batman`) is the `role` the office matches.
+Copy the 16 definition files from this repo's `agents/*.md` to the PC's
+`~/.claude/agents/` (these are the canonical crew; if the PC holds older versions,
+overwrite or merge as you like). The filename (e.g. `batman.md` → agent `batman`)
+is the `role` the office matches.
 
 ## 6. Theme the wings  ⚑
 Palette accents (per-agent colors, boss gold) are already set via steps 2–3. The
@@ -128,6 +128,6 @@ prompts, Claude's replies and the agents' tasks to the network).
 say **"time to call up the core."** In the live office, those same agents spawn as
 the on-screen characters — so the dashboard *shows* the room you're conversing with.
 
-## Reconcile reminder
-`agents-draft/` are proposals. If the home PC still holds real `~/.claude/agents/`
-files, diff first and keep the originals where they differ.
+## Note
+`agents/` is the finalized, canonical crew. If the home PC still holds older
+`~/.claude/agents/` versions, overwrite or merge them in as you prefer — not a blocker.
