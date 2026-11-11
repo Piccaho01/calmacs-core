@@ -48,7 +48,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 .room h2{margin:0 0 2px;font-family:var(--display);font-weight:500;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t);display:flex;justify-content:space-between;gap:8px}
 .room h2 span{color:var(--dim);letter-spacing:1px}
 .room.core h2{letter-spacing:.5px} .room.core h2 span{display:none}
-.hint{display:none;margin:12px 0 0;font-size:13px;color:var(--dim)}
 .desks{display:flex;flex-wrap:wrap;gap:2px}
 .crew{position:relative;background:none;border:0;padding:2px 1px 0;width:50px;display:flex;flex-direction:column;align-items:center;gap:1px}
 .fig{height:54px;width:44px;display:flex;align-items:flex-end;justify-content:center;transition:filter .3s,opacity .3s}
@@ -57,21 +56,12 @@ button{font:inherit;color:inherit;cursor:pointer}
   background:color-mix(in srgb,var(--c) 20%,#0b0e18);border:1px solid color-mix(in srgb,var(--c) 50%,var(--line))}
 .nm{font-family:var(--display);font-size:9.5px;letter-spacing:.3px;color:var(--dim);white-space:nowrap;max-width:54px;overflow:hidden;text-overflow:ellipsis}
 .crew.asleep .fig{filter:grayscale(.9) brightness(.55);opacity:.75}
-.crew .zz{position:absolute;top:0;right:3px;font-family:var(--display);font-size:11px;color:var(--dim);display:none}
-.crew.asleep .zz{display:block;animation:zz 2.6s steps(4) infinite}
 .crew.awake .nm{color:var(--ink)}
 .crew.speaking .nm{color:var(--c);filter:brightness(1.5)}
 .crew.speaking .fig{animation:bob .5s steps(2) infinite}
 .crew.speaking::after{content:"";position:absolute;left:8px;right:8px;bottom:13px;height:3px;background:var(--c);filter:brightness(1.4)}
-@keyframes zz{0%{transform:translateY(4px);opacity:0}40%{opacity:1}100%{transform:translateY(-6px);opacity:0}}
 @keyframes bob{50%{transform:translateY(-3px)}}
-.hq.shut .rooms{display:none}
-.strip{display:none;gap:6px;align-items:center;overflow-x:auto;font-size:13px;color:var(--dim)}
-.hq.shut{padding:6px 16px}
-.hq.shut .strip{display:flex}
-.strip .head{flex:none;height:30px;width:26px;display:flex;align-items:flex-end;justify-content:center}
-.strip .head img{height:100%;image-rendering:pixelated}
-.strip .head.g{height:24px;width:24px;align-items:center;font-size:14px;border-radius:5px;background:color-mix(in srgb,var(--c) 20%,#0b0e18);border:1px solid color-mix(in srgb,var(--c) 50%,var(--line))}
+.hq.shut{display:none}
 
 /* ---------- Comms ---------- */
 .comms{flex:1;min-height:0;display:flex;flex-direction:column}
@@ -111,6 +101,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .starts{display:flex;flex-direction:column;gap:6px;max-width:760px;padding-left:44px}
 .starts button{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:9px 12px;font-size:14.5px}
 .starts button:hover{border-color:var(--tower)}
+.emptyhint{color:var(--dim);font-size:12.5px;max-width:760px;padding-left:44px;margin:8px 0 0}
 
 .dock{flex:none;border-top:1px solid var(--line);padding:10px 16px 12px;background:var(--panel)}
 .chips{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto}
@@ -145,15 +136,15 @@ textarea:focus{outline:none;border-color:var(--gold)}
 @media (min-width:900px){
   .main{flex-direction:row}
   .hq{width:44%;max-height:none;border-bottom:0;border-right:1px solid var(--line);padding:16px}
-  .hq.shut .rooms{display:flex} .hq.shut .strip{display:none} .hq.shut{padding:16px}
+  .hq.shut{display:block}
   #hqToggle{display:none}
   .crew{width:62px} .fig{height:76px;width:56px} .glyph{height:46px;width:46px;font-size:26px;margin-bottom:8px} .nm{font-size:10.5px;max-width:64px}
   .crew.speaking::after{bottom:15px}
   .room{padding:10px 12px 8px} .room h2{font-size:12px;margin-bottom:6px}
-  .room.core h2{letter-spacing:2px} .room.core h2 span{display:inline} .hint{display:block}
+  .room.core h2{letter-spacing:2px} .room.core h2 span{display:inline}
   .rooms{gap:12px}
 }
-@media (prefers-reduced-motion:reduce){.crew.asleep .zz,.crew.speaking .fig{animation:none}}
+@media (prefers-reduced-motion:reduce){.crew.speaking .fig{animation:none}}
 </style>
 </head>
 <body>
@@ -169,8 +160,6 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="main">
     <section class="hq" id="hq" aria-label="Headquarters">
       <div class="rooms" id="rooms"></div>
-      <p class="hint">Tap anyone to see what they do. Sleeping crew wake when you say their name.</p>
-      <div class="strip" id="strip"></div>
     </section>
     <section class="comms" aria-label="Comms">
       <button class="desk" id="desk" type="button" aria-label="The Desk: your dashboard AI, JARVIS and Ultron">
@@ -183,8 +172,6 @@ textarea:focus{outline:none;border-color:var(--gold)}
         <div class="chips">
           <button class="chip call" type="button" data-say="Time to call up the core.">CALL UP THE CORE</button>
           <button class="chip" type="button" data-say="Stand down, everyone.">STAND DOWN</button>
-          <button class="chip" type="button" data-pre="Batman, ">BATMAN</button>
-          <button class="chip" type="button" data-pre="Doom, review this: ">DOOM</button>
           <button class="chip" type="button" data-pre="Ultron, ">ULTRON</button>
         </div>
         <form class="row" id="form">
@@ -192,7 +179,6 @@ textarea:focus{outline:none;border-color:var(--gold)}
           <button class="send" id="send" type="submit">SEND</button>
           <button class="hands" id="hands" type="button" title="Send this order to the crew in Claude Code, who can change your repos">HANDS</button>
         </form>
-        <p class="fine" id="fine">SEND talks to the crew here: they think, plan, write and review. HANDS passes the order to the crew in Claude Code, who can change your GitHub repos and report back here.</p>
       </div>
     </section>
   </div>
@@ -357,7 +343,7 @@ function renderRooms(){
     return '<div class="room '+r.cls+'"><h2>'+r.name+'<span>'+r.sub+'</span></h2><div class="desks">'+
       people.map(function(c){
         return '<button type="button" class="crew" data-id="'+c.id+'" style="--c:'+c.color+'" aria-label="'+esc(c.full||c.name)+'">'+
-          figHTML(c,'fig')+'<span class="nm">'+esc(c.name)+'</span><span class="zz" aria-hidden="true">z</span></button>';
+          figHTML(c,'fig')+'<span class="nm">'+esc(c.name)+'</span></button>';
       }).join('')+'</div></div>';
   }).join('');
 }
@@ -371,20 +357,17 @@ function renderState(){
   var pill=$('pill'), n=awake.filter(function(id){return !BY[id].hidden&&!BY[id].desk;}).length;
   pill.className='pill'+(S.coreUp?' up':n?' some':'');
   pill.textContent=S.coreUp?'CORE UP':n?n+' AWAKE':'ASLEEP';
-  var shown=awake.filter(function(id){return !BY[id].hidden&&!BY[id].desk;});
   var dk=$('desk'); if(dk) dk.classList.toggle('live',speaking==='jarvis'||speaking==='ultron');
-  $('strip').innerHTML=shown.length?shown.map(function(id){var c=BY[id];
-    return c.sprite?'<span class="head"><img src="crew/'+c.id+'.png" alt="'+esc(c.name)+'"></span>':'<span class="head g" style="--c:'+c.color+'" title="'+esc(c.name)+'">'+c.emoji+'</span>';}).join('')
-    :'Everyone is asleep. Call up the core or say a name.';
 }
 function renderLog(){
   var h='';
   if(!S.items.length){
-    h+=turnsHTML([{id:'jarvis',text:"Evening, Calmac. JARVIS here \u2014 your Desk. Ask me anything and I'll handle it or pull in the crew when a job needs them. Ultron's around too, if you want it blunt."}]);
+    h+=turnsHTML([{id:'jarvis',text:"Evening, Calmac. JARVIS here \u2014 your Desk. Ask me anything; I'll pull in the crew when a job needs them."}]);
     h+='<div class="starts">'+
-      '<button type="button" data-say="JARVIS, help me sort out what to focus on today.">JARVIS, help me plan my day</button>'+
+      '<button type="button" data-say="JARVIS, help me sort out what to focus on today.">Help me plan my day</button>'+
       '<button type="button" data-say="Ultron, what am I avoiding that I should not be?">Ultron, what am I avoiding?</button>'+
-      '<button type="button" data-say="Time to call up the core. I want a launch plan for a small pixel-art game I can build in a month.">Call up the core: plan a one-month game launch</button></div>';
+      '<button type="button" data-say="Time to call up the core. I want a launch plan for a small pixel-art game I can build in a month.">Call up the core: plan a game launch</button></div>'+
+      '<p class="emptyhint">SEND asks the Desk. HANDS sends a job to the crew in Claude Code to change your repos.</p>';
   }
   S.items.forEach(function(it){
     if(it.r==='b') h+='<div class="boss"><div class="who">Calmac</div><div class="say">'+esc(it.t)+'</div></div>';
@@ -643,7 +626,7 @@ function start(data){
   if(!ok){ try{ok=adopt(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){} }
   if(data&&data.draft){msg.value=data.draft;}
   renderRooms(); $('deskav').innerHTML=deskAvatars(); renderState(); renderLog(); grow();
-  if(S.items.length&&window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
+  if(window.matchMedia('(max-width:899px)').matches) $('hq').classList.add('shut');
   initCloud(); getSample();
 }
 var hot=window.claude&&window.claude.hot;
