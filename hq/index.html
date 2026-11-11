@@ -476,7 +476,7 @@ function initCloud(){
     var db=r[0], user=r[1]; if(!db||!user) return;
     return user.id().then(function(uid){
       if(!uid) return;
-      watchJobs(db);
+      jobsDb=db; watchJobs(db);
       docRef=db.doc('data/users/'+uid+'/thread');
       docRef.onSnapshot(function(snap){
         if(!snap.exists||snap.metadata.hasPendingWrites||busy) return;
@@ -489,7 +489,7 @@ function initCloud(){
 
 
 /* ================= Hands: orders to the crew in Claude Code ================= */
-var commentsP=null;
+var commentsP=null, jobsDb=null;
 function getComments(){
   if(!commentsP) commentsP=(window.claude&&window.claude.use)?window.claude.use('comments').catch(function(){return null;}):Promise.resolve(null);
   return commentsP;
@@ -512,7 +512,9 @@ function sendToHands(){
     if(!c||!c.sendToClaude) throw {code:'absent'};
     return c.canSendToClaude().catch(function(){return 'off';}).then(function(can){
       if(can!=='available') throw {code:'cant',why:can};
-      return c.anchorFor($('log')).then(function(anchor){ return c.sendToClaude({anchor:anchor,text:text}); });
+      /* The session cannot read page-written comments, so the order itself goes in the db; the comment is the wake-up. */
+      var saved=jobsDb?jobsDb.doc('jobs/'+id).set({status:'sent',order:clip(order,6000),context:clip(lastCrew||'',8000),created:Date.now()}).catch(function(){}):Promise.resolve();
+      return saved.then(function(){return c.anchorFor($('log'));}).then(function(anchor){ return c.sendToClaude({anchor:anchor,text:text}); });
     });
   }).then(function(){
     if(typed){ S.items.push({r:'b',t:typed}); msg.value=''; grow(); }
