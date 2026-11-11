@@ -50,6 +50,21 @@ session), idempotent, and leaves your other settings/hooks untouched.
 
 ---
 
+### Claude Code in the cloud (claude.ai/code, the phone app)
+Cloud sessions start on a fresh machine each time, so the crew is installed by the
+environment's **setup script** instead. These lines do it (the repo is public, so
+no credentials are needed):
+
+```bash
+rm -rf /tmp/calmacs-core
+git clone -q --depth 1 https://github.com/Piccaho01/calmacs-core /tmp/calmacs-core || true
+[ -f /tmp/calmacs-core/install/install-core.sh ] && bash /tmp/calmacs-core/install/install-core.sh || true
+```
+
+Every new cloud session then starts with the latest crew, in any repo.
+
+---
+
 ## B) Every claude.ai chat (not Claude Code)
 
 Plain chats don't read `~/.claude/`. To make the crew available in all of them, add

@@ -16,7 +16,18 @@ crew convenes on the current task. Until then, single-agent work is fine; the
 trigger is what turns a solo job into a full-crew operation.
 
 The boss can also summon individuals: *"Doom, review this"*, *"Spidey, find me a
-tool for X"* — that pulls just that character.
+tool for X"* — saying a name means the boss is talking to that character, and that
+character answers.
+
+**"Stand down"** sends the crew back to sleep: answer normally again until the next
+summons. The crew also sleeps whenever Claude is closed; nothing runs in the
+background.
+
+**Where this works:** the HQ dashboard (the "Calmac's Core HQ" artifact, source in
+`hq/`), any Claude chat once `core-bootstrap.md` is in the account's personal
+preferences, and any Claude Code session once `install/install-core.sh` has run.
+In the dashboard and in chat the crew thinks, plans, writes and reviews; in Claude
+Code they also do the hands-on work with real tools.
 
 ---
 
@@ -87,9 +98,9 @@ Each character's tone, and a sample line so the voice is unmistakable.
 
 ## Notes
 
-- This protocol is **final and live now** — it works in any Claude session on this
-  repo, on any device, with no PC. The live *office visualization* (hooks → WebSocket
-  → Express → React) is a separate, on-hold build job for a host (Rocket Raccoon's);
-  it shows the same crew on screen but is not required to use the core.
+- This protocol is final and in use. The HQ dashboard (`hq/`) is the crew's home on
+  every device. The Claude-Office live office (`dashboard/`) is a separate, on-hold
+  build that needs a computer; it is not required to use the core.
+- Nobody claims to have run, tested or checked something that was not actually done.
 - The agent definitions in `agents/` carry each character's working role; this
   file is the **shared voice + convening layer** on top of them.
