@@ -137,6 +137,12 @@ textarea::placeholder{color:var(--faint)}
 .step{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
 .step h4{font-size:15px;margin-bottom:2px}
 .step pre{margin:9px 0;background:#0e1119;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:var(--mono);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow-y:auto}
+.seg{display:flex;gap:8px;margin-top:6px}
+.segb{flex:1;display:flex;flex-direction:column;gap:2px;align-items:center;padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--dim)}
+.segb b{font-family:var(--display);font-size:12px;letter-spacing:.5px;color:var(--ink)}
+.segb span{font-size:11px;color:var(--faint)}
+.segb.on{border-color:color-mix(in srgb,var(--gold) 55%,var(--line));background:rgba(233,196,90,.1)}
+.segb.on b{color:var(--gold)}
 
 .hq.shut{display:none}
 
@@ -275,7 +281,8 @@ var BOOTSTRAP="You are running Calmac's Core, a crew of 16 AI agents I (the boss
 var INSTALL_CMD="git clone https://github.com/Piccaho01/calmacs-core ~/calmacs-core 2>/dev/null || git -C ~/calmacs-core pull\nbash ~/calmacs-core/install/install-core.sh\nbash ~/calmacs-core/install/enable-auto-update.sh";
 
 /* ================= State ================= */
-var S={items:[],coreUp:false,awake:[],updated:0,jobs:{}};
+var S={items:[],coreUp:false,awake:[],updated:0,jobs:{},tier:'default'};
+var TIER_KEY='calmac-core-tier-v1';
 var busy=false, speaking=null, ctl=null, live='';
 var $=function(id){return document.getElementById(id);};
 var log=$('log'), msg=$('msg'), sendBtn=$('send');
@@ -438,7 +445,7 @@ function say(text){
   var fallback=liveFallback();
   getSample().then(function(sample){
     if(!sample) throw {code:'absent'};
-    return sample(buildMessages(hq),{cache:false,signal:ctl.signal,onText:function(e){live=e.text||'';renderLive();}});
+    return sample(buildMessages(hq),{cache:false,signal:ctl.signal,modelTier:S.tier,onText:function(e){live=e.text||'';renderLive();}});
   }).then(function(res){
     var text=(res&&res.text)||live;
     if(text.trim()) S.items.push({r:'c',t:text,f:fallback});
@@ -581,7 +588,11 @@ function crewSheet(id){
   openSheet(h);
 }
 function setupSheet(){
-  openSheet('<h3>Take the crew anywhere</h3><p>This page is the HQ. To have the same crew answer when you say their names in other places, set each one up once.</p>'+
+  var tiers=[['quick','Quick','snappy'],['default','Balanced','recommended'],['complex','Deep','thinks harder']];
+  var seg='<div class="seg">'+tiers.map(function(t){return '<button type="button" class="segb'+(S.tier===t[0]?' on':'')+'" data-tier="'+t[0]+'"><b>'+t[1]+'</b><span>'+t[2]+'</span></button>';}).join('')+'</div>';
+  openSheet('<h3>Settings</h3>'+
+   '<div class="step" style="border-top:0;margin-top:0;padding-top:0"><h4>Reply depth</h4><p>How hard the crew think before answering in this dashboard.</p>'+seg+'</div>'+
+   '<h3 style="margin-top:16px">Take the crew anywhere</h3><p>To have the same crew answer when you say their names in other places, set each one up once.</p>'+
    '<div class="step"><h4>Claude chat, app or web</h4><p>Copy this, then paste it into Settings, Profile, under your personal preferences. Every new chat then knows the crew.</p><pre id="bsTxt"></pre><button class="btn" type="button" data-copy="bs">COPY CREW INSTRUCTIONS</button></div>'+
    '<div class="step"><h4>Claude Code on a computer</h4><p>Run this once in a terminal. The crew installs for every project and keeps itself up to date.</p><pre id="cmdTxt"></pre><button class="btn" type="button" data-copy="cmd">COPY COMMAND</button></div>'+
    '<div class="step"><h4>Claude Code in the cloud</h4><p>Cloud sessions pick the crew up from your environment\'s setup script. Ask Claude in a session to "install Calmac\'s Core in this environment" if it is missing.</p></div>'+
@@ -597,10 +608,11 @@ function copy(btn,text){
 function grow(){msg.style.height='auto';msg.style.height=Math.min(msg.scrollHeight+4,140)+'px';}
 function prefill(t){msg.value=t+msg.value.replace(/^\s+/,'');grow();msg.focus();try{msg.setSelectionRange(msg.value.length,msg.value.length);}catch(e){}}
 document.addEventListener('click',function(e){
-  var el=e.target.closest('[data-say],[data-pre],[data-close],[data-copy],.crew,#desk');
+  var el=e.target.closest('[data-say],[data-pre],[data-close],[data-copy],[data-tier],.crew,#desk');
   if(e.target===veil){closeSheet();return;}
   if(!el) return;
   if(el.hasAttribute('data-close')){closeSheet();return;}
+  if(el.hasAttribute('data-tier')){S.tier=el.getAttribute('data-tier');try{localStorage.setItem(TIER_KEY,S.tier);}catch(e){}setupSheet();return;}
   if(el.hasAttribute('data-copy')){copy(el,el.getAttribute('data-copy')==='bs'?BOOTSTRAP:INSTALL_CMD);return;}
   if(el.hasAttribute('data-say')){closeSheet();say(el.getAttribute('data-say'));return;}
   if(el.hasAttribute('data-pre')){closeSheet();prefill(el.getAttribute('data-pre'));return;}
@@ -635,6 +647,7 @@ function start(data){
   var ok=false;
   if(data&&data.items) ok=adopt(data);
   if(!ok){ try{ok=adopt(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){} }
+  try{var tv=localStorage.getItem(TIER_KEY); if(['quick','default','complex'].indexOf(tv)>=0) S.tier=tv;}catch(e){}
   if(data&&data.draft){msg.value=data.draft;}
   // The Desk greets by default: only keep a restored thread while the core is actively up.
   if(ok && !S.coreUp){ S.items=[]; S.awake=[]; S.updated=Date.now(); }
