@@ -64,6 +64,7 @@ svg{display:block}
 .av img{height:92%;width:auto;max-width:96%;object-fit:contain;image-rendering:pixelated}
 .av.orb{align-items:center} .av.orb img{height:84%}
 .av.mono{align-items:center;font-family:var(--serif);color:#20170a;border:0;background:linear-gradient(160deg,var(--gold2),var(--gold-deep))}
+.av.emj{align-items:center;background:#19120e;border:1px solid var(--line)}
 .s40{width:40px;height:44px} .s40.mono{font-size:22px}
 .s46{width:44px;height:48px} .s46.mono{font-size:22px}
 .s60{width:58px;height:64px} .s60.mono{font-size:30px}
@@ -367,6 +368,7 @@ function parseTurns(raw,fallback){
 }
 function av(c,size){
   if(c.sprite) return '<span class="av '+size+(c.orb?' orb':'')+'"><img src="crew/'+c.id+'.png" alt=""></span>';
+  if(c.emoji) return '<span class="av mono emj '+size+'" aria-hidden="true">'+c.emoji+'</span>';
   return '<span class="av mono '+size+'" aria-hidden="true">'+esc((c.full||c.name).charAt(0))+'</span>';
 }
 function turnsHTML(turns){
