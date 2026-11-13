@@ -4,7 +4,7 @@
 # Claude Code session on this machine (any repo), not just the calmacs-core repo.
 #
 # What it does (idempotent — safe to re-run):
-#   1. Copies the 16 agent definitions to ~/.claude/agents/  (global subagents)
+#   1. Copies the agent definitions to ~/.claude/agents/  (global subagents)
 #   2. Inserts/updates a managed block in ~/.claude/CLAUDE.md with the Core
 #      Protocol (the "time to call up the core" trigger + voices). Your existing
 #      global memory outside the managed block is left untouched.

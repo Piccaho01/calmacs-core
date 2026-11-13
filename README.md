@@ -1,6 +1,6 @@
 # calmacs-core
 
-**Calmac's Core**: a crew of 16 characters who work for the boss, and the HQ they
+**Calmac's Core**: a crew of 20 characters who work for the boss, and the HQ they
 live in.
 
 ## Use it
@@ -17,7 +17,7 @@ live in.
 
 | Path | What |
 |---|---|
-| `agents/` | The 16 crew definitions |
+| `agents/` | The 20 crew definitions |
 | `core-protocol.md` | How the crew is summoned, routed and voiced |
 | `hq/` | The HQ dashboard (published as a Claude artifact) |
 | `install/` | Global install and self-update for Claude Code |
