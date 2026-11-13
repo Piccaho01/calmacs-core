@@ -611,20 +611,51 @@ function watchJobs(db){
 }
 
 /* ================= Voice (only where the viewer's browser offers it) ================= */
-var tts=null, dict=null, listening=false, dictBase='';
+var tts=null, dict=null, webVoice=false, listening=false, dictBase='';
+var synth=(typeof window!=='undefined'&&window.speechSynthesis)?window.speechSynthesis:null;
 function plain(s){return s.replace(/```[\s\S]*?```/g,' (code on screen) ').replace(/[*_`#>]/g,'').replace(/\s+/g,' ').trim();}
-function speakTurns(turns){
-  if(!tts||!voiceOn) return;
-  var lines=turns.filter(function(t){return t.text;}).slice(0,8).map(function(t){
-    var c=BY[t.id]||BY.jarvis; return {text:plain(t.text).slice(0,1800),voice:c.tts||'buttery'};
-  }).filter(function(l){return l.text;});
-  if(!lines.length) return;
-  try{ Promise.resolve(tts.speak(lines)).catch(function(e){ if(e&&e.code==='not_granted'){voiceOn=false;$('voiceBtn').hidden=true;} }); }catch(e){}
+/* Each character's styling for the device's own voice (iPhone has no per-character AI voices): [rate, pitch]. */
+var WEBV={buttery:[.96,.9],glassy:[.96,.6],airy:[1.1,1.25],rounded:[1,1]};
+function enVoice(){ if(!synth) return null; var vs=synth.getVoices()||[]; return vs.filter(function(v){return /^en\b|^en[-_]/i.test(v.lang);})[0]||vs[0]||null; }
+function webSpeak(turns){
+  if(!synth) return;
+  try{ synth.cancel(); }catch(e){}
+  var v=enVoice();
+  turns.slice(0,8).forEach(function(t){
+    var c=BY[t.id]||BY.jarvis, txt=plain(t.text).slice(0,520); if(!txt) return;
+    try{
+      var u=new SpeechSynthesisUtterance(txt), s=WEBV[c.tts]||[1,1];
+      u.rate=Math.max(.6,Math.min(1.5,(c.rate||1)*s[0])); u.pitch=s[1];
+      if(v){ u.voice=v; u.lang=v.lang; }
+      synth.speak(u);
+    }catch(e){}
+  });
 }
-function stopVoice(){ if(tts) try{tts.stop();}catch(e){} }
-function setVoice(on){ voiceOn=on; $('voiceBtn').classList.toggle('on',on); try{localStorage.setItem(VOICE_KEY,on?'1':'0');}catch(e){} if(!on) stopVoice(); }
+function speakTurns(turns){
+  if(!voiceOn) return;
+  var lines=turns.filter(function(t){return t.text;});
+  if(!lines.length) return;
+  if(tts){
+    var api=lines.slice(0,8).map(function(t){ var c=BY[t.id]||BY.jarvis; return {text:plain(t.text).slice(0,1800),voice:c.tts||'buttery'}; }).filter(function(l){return l.text;});
+    if(api.length) try{ Promise.resolve(tts.speak(api)).catch(function(e){ if(e&&e.code==='not_granted'){voiceOn=false;$('voiceBtn').hidden=true;} }); }catch(e){}
+    return;
+  }
+  if(webVoice) webSpeak(lines);
+}
+function stopVoice(){ if(tts) try{tts.stop();}catch(e){} if(synth) try{synth.cancel();}catch(e){} }
+function setVoice(on){
+  voiceOn=on; $('voiceBtn').classList.toggle('on',on);
+  try{localStorage.setItem(VOICE_KEY,on?'1':'0');}catch(e){}
+  if(!on){ stopVoice(); return; }
+  /* iOS needs a gesture-primed silent utterance before later speak() calls make sound. */
+  if(webVoice&&synth){ try{ synth.resume(); var u=new SpeechSynthesisUtterance(' '); u.volume=0; synth.speak(u); }catch(e){} }
+}
 function initVoice(){
-  use('tts').then(function(t){ if(!t) return; tts=t; $('voiceBtn').hidden=false; $('voiceBtn').classList.toggle('on',voiceOn); });
+  use('tts').then(function(t){
+    if(t){ tts=t; }
+    else if(synth&&typeof window.SpeechSynthesisUtterance!=='undefined'){ webVoice=true; try{ synth.getVoices(); synth.onvoiceschanged=function(){}; }catch(e){} }
+    if(tts||webVoice){ $('voiceBtn').hidden=false; $('voiceBtn').classList.toggle('on',voiceOn); }
+  });
   use('dictation').then(function(d){
     if(!d) return; dict=d; $('micBtn').hidden=false;
     try{
@@ -660,7 +691,9 @@ function settingsSheet(){
   h+='<h4>What the Desk remembers</h4>';
   h+=MEM.length?MEM.map(function(m,i){return '<div class="mem"><span>'+esc(m.t)+'</span><button type="button" data-forget="'+i+'" aria-label="Forget this">×</button></div>';}).join('')
     :'<p>Nothing yet. Tell the crew about your projects, deadlines and preferences and Uatu will keep the lasting facts here, on every device.</p>';
-  h+='<h4>Voice</h4><p>'+(tts?'Tap the speaker in the top bar to have replies read aloud, each character in their own voice.':'Spoken replies are not offered in this view.')+' '+(dict?'Tap the microphone by the message box to dictate.':'Dictation is not offered in this view.')+'</p>';
+  var vtxt=tts?'Tap the speaker in the top bar to have replies read aloud, each character in their own voice.':webVoice?'Tap the speaker in the top bar to have replies read aloud in your device’s own voice (on iPhone the fancy per-character voices aren’t available).':'Spoken replies are not offered in this view.';
+  var dtxt=dict?'Tap the microphone by the message box to dictate.':'Dictation isn’t offered here; on iPhone, use the microphone on your keyboard in the message box.';
+  h+='<h4>Voice</h4><p>'+vtxt+' '+dtxt+'</p>';
   h+='<h4>Take the crew anywhere</h4><p>Claude chat: paste this into Settings, Profile, personal preferences.</p><pre id="bsTxt"></pre><button class="btn ghost" type="button" data-copy="bs">Copy crew instructions</button>'+
      '<p style="margin-top:12px">Claude Code on a computer: run once in a terminal.</p><pre id="cmdTxt"></pre><button class="btn ghost" type="button" data-copy="cmd">Copy command</button>'+
      '<div class="acts"><button class="btn ghost" type="button" data-close>Close</button></div>';
