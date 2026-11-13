@@ -16,7 +16,7 @@ bash install/install-core.sh
 ```
 
 It installs, into your global `~/.claude/`:
-- the **16 agents** → `~/.claude/agents/` (summonable as subagents in every project)
+- the **20 agents** → `~/.claude/agents/` (summonable as subagents in every project)
 - the **Core Protocol** → a managed block in `~/.claude/CLAUDE.md` (loads in every
   session, any repo)
 
